@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
     res.send('ello mundo')
 })
 
-app.get('/access_token', (req,res)=>{
+app.get('/access_token', (req, res) => {
     generateToken();
 })
 
@@ -30,7 +30,7 @@ const generateToken = async (req, res, next) => {
 
     let auth = Buffer.from(`${consumer}:${secret}`).toString('base64');
     console.log(auth)
-    let decauth = Buffer.from(auth,'base64').toString('ascii');
+    let decauth = Buffer.from(auth, 'base64').toString('ascii');
     console.log(decauth)
 
 
@@ -80,7 +80,7 @@ app.post("/stk", generateToken, async (req, res) => {
             PartyA: `254${phone}`,
             PartyB: shortcode,
             PhoneNumber: `254${phone}`,
-            CallBackURL: "https://a1f4-196-202-223-196.jp.ngrok.io/callback",
+            CallBackURL: "https://lipa.onrender.com/callback",
             AccountReference: `lipa_na_nodejs`, // Account number used when paying
             TransactionDesc: "Test"
         },
@@ -93,20 +93,36 @@ app.post("/stk", generateToken, async (req, res) => {
         console.log(response.data)
         res.status(200).json(response.data)
     })
-    .catch((err) => {
-        console.log(err.message)
-        res.status(400).json(err.message)
-    })
+        .catch((err) => {
+            console.log(err.message)
+            res.status(400).json(err.message)
+        })
 
 
 })
 
-
-app.post('/callback',(req,res)=>{
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+app.post('/callback', async (req, res) => {
     const callback_result = req.body;
-    console.log(callback_result);
-    if(!callback_result.Body.stkCallback.CallbackMetadata){
-       return res.json("ok");
+    // console.log(callback_result);
+    if (!callback_result.Body.stkCallback.CallbackMetadata) {
+        return res.json("ok");
     }
-    console.log(callback_result.Body.stkCallback.CallbackMetadata);
+    // console.log(callback_result.Body.stkCallback.CallbackMetadata);
+
+    const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[3]
+    const transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1]
+    const ammount = callback_result.Body.stkCallback.CallbackMetadata.Item[0]
+
+    const data = { phone, transcId, ammount }
+    console.log(data)
+    const payment = await prisma.payment.create({
+        data:{
+           transc_id:transcId,
+            amount:ammount,
+            number:phone
+        }
+    })
+
 })
