@@ -80,8 +80,8 @@ app.post("/stk", generateToken, async (req, res) => {
             PartyA: `254${phone}`,
             PartyB: shortcode,
             PhoneNumber: `254${phone}`,
-            CallBackURL: "https://lipa.onrender.com/callback",
-            AccountReference: `254${phone}`, // Account number used when paying
+            CallBackURL: "https://a1f4-196-202-223-196.jp.ngrok.io/callback",
+            AccountReference: `lipa_na_nodejs`, // Account number used when paying
             TransactionDesc: "Test"
         },
         {
@@ -108,5 +108,5 @@ app.post('/callback',(req,res)=>{
     if(!callback_result.Body.stkCallback.CallbackMetadata){
        return res.json("ok");
     }
-    console.log(!callback_result.Body.stkCallback.CallbackMetadata);
+    console.log(callback_result.Body.stkCallback.CallbackMetadata);
 })
