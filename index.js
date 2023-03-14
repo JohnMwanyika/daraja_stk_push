@@ -62,7 +62,8 @@ app.post("/stk", generateToken, async (req, res) => {
         ("0" + date.getMinutes()).slice(-2) +
         ("0" + date.getSeconds()).slice(-2);
 
-    const shortcode = process.env.MPESA_SHORTCODE;
+    // const shortcode = process.env.MPESA_SHORTCODE;
+    const shortcode = 174379;
     const passkey = process.env.MPESA_PASSKEY;
 
     const password = Buffer.from(shortcode + passkey + timestap).toString('base64')
@@ -79,7 +80,7 @@ app.post("/stk", generateToken, async (req, res) => {
             PartyA: `254${phone}`,
             PartyB: shortcode,
             PhoneNumber: `254${phone}`,
-            CallBackURL: "https://mydomain.com/pat",
+            CallBackURL: "https://lipa.onrender.com/callback",
             AccountReference: `254${phone}`, // Account number used when paying
             TransactionDesc: "Test"
         },
@@ -98,4 +99,14 @@ app.post("/stk", generateToken, async (req, res) => {
     })
 
 
+})
+
+
+app.post('/callback',(req,res)=>{
+    const callback_result = req.body;
+    console.log(callback_result);
+    if(!callback_result.Body.stkCallback.CallbackMetadata){
+       return res.json("ok");
+    }
+    console.log(!callback_result.Body.stkCallback.CallbackMetadata);
 })
