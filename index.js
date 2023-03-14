@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
     res.send('ello mundo')
 })
 
-app.get('/token', (req,res)=>{
+app.get('/access_token', (req,res)=>{
     generateToken();
 })
 
@@ -49,3 +49,54 @@ const generateToken = async (req, res, next) => {
 
 }
 
+// app.post("/stk", generateToken, async (req, res) => {
+//     const phone = req.body.phone.substring(1)
+//     const amount = req.body.amount
+
+//     const date = new Date();
+//     const timestap =
+//         date.getFullYear() +
+//         ("0" + (date.getMonth() + 1)).slice(-2) +
+//         ("0" + date.getDate()).slice(-2) +
+//         ("0" + date.getHours()).slice(-2) +
+//         ("0" + date.getMinutes()).slice(-2) +
+//         ("0" + date.getSeconds()).slice(-2);
+
+//     // const shortcode = process.env.MPESA_SHORTCODE;
+//     const shortcode = 174379;
+//     const passkey = process.env.MPESA_PASSKEY;
+
+//     const password = Buffer.from(shortcode + passkey + timestap).toString('base64')
+
+//     await axios.post(
+//         "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+//         {
+//             // "BusinessShortCode": "174379",
+//             BusinessShortCode: shortcode,
+//             Password: password,
+//             Timestamp: timestap,
+//             TransactionType: "CustomerPayBillOnline", // "CustomerBuyGoodsOnline"
+//             Amount: amount,
+//             PartyA: `254${phone}`,
+//             PartyB: shortcode,
+//             PhoneNumber: `254${phone}`,
+//             CallBackURL: "https://mydomain.com/pat",
+//             AccountReference: `254${phone}`, // Account number used when paying
+//             TransactionDesc: "Test"
+//         },
+//         {
+//             headers: {
+//                 Authorization: `Bearer ${token}` //token generated everytime you send a request to safaricom
+//             }
+//         }
+//     ).then((response) => {
+//         console.log(response.data)
+//         res.status(200).json(response.data)
+//     })
+//     .catch((err) => {
+//         console.log(err.message)
+//         res.status(400).json(err.message)
+//     })
+
+
+// })
