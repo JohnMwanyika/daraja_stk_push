@@ -14,7 +14,7 @@ noscript.
 //- sweet alert
 script(src="https://cdn.jsdelivr.net/npm/sweetalert2@10")
 //- jquery
-script(src="/assets/js/jquery.min.js")
+script(src="assets/js/jquery.min.js")
 
 script.
 
@@ -154,7 +154,7 @@ main.container
 
                 Enter your phone number and amount to be paid
             //  Form 
-            form(action="/stk",method="post")
+            form(action="/stk",method="post")#myForm
                 .row
                     .col-12
                         .mb-4
@@ -195,7 +195,8 @@ main.container
                 .row.align-items-center.text-center
                     .col-12
                         //  Button 
-                        button.btn.w-100.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push
+                        button.btn.w-100.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push 
+                            span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
                     .col-12
                         //  Link 
                         //- small.mb-0.text-muted
@@ -206,81 +207,81 @@ main.container
 
 //- main js
 script(src="assets/js/theme.bundle.js")
-    script.
-        var loading = $('#spina').hide();
-        //- var submitbtn = $('#submit');
-        //-  $(':input[type="submit"]').prop('disabled', true);
-        //-  $('input[type="text"], input[type="date"], .txtArea').keyup(function() {
-        //- if($('input[type="text"]').val() && $('input[type="date"]').val() && $('.txtArea').val() != '') {
-        //-     $(':input[type="submit"]').prop('disabled', false);
-        //- }
-        //- });
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        })
+script.
+    var loading = $('#spina').hide();
+    //- var submitbtn = $('#submit');
+    //-  $(':input[type="submit"]').prop('disabled', true);
+    //-  $('input[type="text"], input[type="date"], .txtArea').keyup(function() {
+    //- if($('input[type="text"]').val() && $('input[type="date"]').val() && $('.txtArea').val() != '') {
+    //-     $(':input[type="submit"]').prop('disabled', false);
+    //- }
+    //- });
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    })
 
 
-   
-        $("#submitbtn").click(function(event){
-            event.preventDefault();
-            //- get form
-            var form = $("#myForm");
-            //- ajax call
-            if ($('input').val() == "" && $('.date').val() == "" && $('.txtArea').val() == "") {
-                Toast.fire({
-                    icon: "error",
-                    title: "All fields are required"
-                });
-            }else{
-                $.ajax({
-                    url:"/dashboard/projects/new-project-api",
-                    type:form.attr('method'),
-                    data: form.serialize(),
-                    beforeSend: function(){
-                        loading.show(function(){
-                            $("#submitbtn").prop("disabled", true);
+
+    $("#submitbtn").click(function(event){
+        event.preventDefault();
+        //- get form
+        var form = $("#myForm");
+        //- ajax call
+        if ($('input').val() == "") {
+            Toast.fire({
+                icon: "error",
+                title: "All fields are required"
+            });
+        }else{
+            $.ajax({
+                url:"/dashboard/projects/new-project-api",
+                type:form.attr('method'),
+                data: form.serialize(),
+                beforeSend: function(){
+                    loading.show(function(){
+                        $("#submitbtn").prop("disabled", true);
+                    });
+                },
+                complete: function(){
+                    loading.hide(function(){
+                        $("#submitbtn").removeAttr('disabled');
+                    });
+                    //- loading.hide();
+                },
+                success: function(data){
+                    var msg = data.message.type;
+                    if(msg == "success"){
+                        //- Clears The form fields
+                        form[0].reset();
+                        //- fires the toast
+                        Toast.fire({
+                            icon: data.message.type,
+                            title: data.message.info
                         });
-                    },
-                    complete: function(){
-                        loading.hide(function(){
-                            $("#submitbtn").removeAttr('disabled');
+                    }else{
+                        Toast.fire({
+                            icon: "error",
+                            title: "Oops! an error occured"
                         });
-                        //- loading.hide();
-                    },
-                    success: function(data){
-                        var msg = data.message.type;
-                        if(msg == "success"){
-                            //- Clears The form fields
-                            form[0].reset();
-                            //- fires the toast
-                            Toast.fire({
-                                icon: data.message.type,
-                                title: data.message.info
-                            });
-                        }else{
-                            Toast.fire({
-                                icon: "error",
-                                title: "Oops! an error occured"
-                            });
-                        }
-                    },
-                    timeout: 5000,
-                    error: function (request, status, error) {
-                        alert(request.responseText);
-                        //- Toast.fire({
-                        //-     icon: "error",
-                        //-     title: "Oops! an error occured"
-                        //- });
                     }
+                },
+                timeout: 5000,
+                error: function (request, status, error) {
+                    alert(request.responseText);
+                    //- Toast.fire({
+                    //-     icon: "error",
+                    //-     title: "Oops! an error occured"
+                    //- });
+                }
 
-                });
-            }
-        });
+            });
+        }
+    });

@@ -117,7 +117,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 app.post('/callback', async (req, res) => {
     const callback_result = req.body;
-    // console.log(callback_result);
+    console.log(callback_result);
     if (!callback_result.Body.stkCallback.CallbackMetadata) {
         return res.json("ok");
     }
