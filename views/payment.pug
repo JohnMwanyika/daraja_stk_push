@@ -11,6 +11,11 @@ link(rel="stylesheet" media="print" onload="this.onload=null;this.removeAttribut
 noscript.
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&amp;display=swap">
 
+//- sweet alert
+script(src="https://cdn.jsdelivr.net/npm/sweetalert2@10")
+//- jquery
+script(src="/assets/js/jquery.min.js")
+
 script.
 
     // Theme switcher
@@ -149,7 +154,7 @@ main.container
 
                 Enter your phone number and amount to be paid
             //  Form 
-            form(action="/stk",method="post")
+            form(action="https://lipa.onrender.com/stk",method="post")
                 .row
                     .col-12
                         .mb-4
@@ -177,7 +182,7 @@ main.container
                             //  Input 
                             .input-group.input-group-merge
                                 input.form-control(type="number" autocomplete="off", data-toggle-password-input, placeholder="E.g 10",name="amount")
-                                button.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
+                                //- button.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
                 //  / .row 
                 //- .form-check
                     //  Input 
@@ -198,8 +203,84 @@ main.container
                             a.fw-semibold(href="sign-up-basic.html") Sign up
                 //  / .row 
                 //  / .row 
-//  / main 
-//  JAVASCRIPT
-//  Theme JS 
+
+//- main js
 script(src="assets/js/theme.bundle.js")
-//  Mirrored from dashly-theme.com/sign-in-basic.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 01 Mar 2023 06:38:34 GMT 
+    script.
+        var loading = $('#spina').hide();
+        //- var submitbtn = $('#submit');
+        //-  $(':input[type="submit"]').prop('disabled', true);
+        //-  $('input[type="text"], input[type="date"], .txtArea').keyup(function() {
+        //- if($('input[type="text"]').val() && $('input[type="date"]').val() && $('.txtArea').val() != '') {
+        //-     $(':input[type="submit"]').prop('disabled', false);
+        //- }
+        //- });
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+
+
+   
+        $("#submitbtn").click(function(event){
+            event.preventDefault();
+            //- get form
+            var form = $("#myForm");
+            //- ajax call
+            if ($('input').val() == "" && $('.date').val() == "" && $('.txtArea').val() == "") {
+                Toast.fire({
+                    icon: "error",
+                    title: "All fields are required"
+                });
+            }else{
+                $.ajax({
+                    url:"/dashboard/projects/new-project-api",
+                    type:form.attr('method'),
+                    data: form.serialize(),
+                    beforeSend: function(){
+                        loading.show(function(){
+                            $("#submitbtn").prop("disabled", true);
+                        });
+                    },
+                    complete: function(){
+                        loading.hide(function(){
+                            $("#submitbtn").removeAttr('disabled');
+                        });
+                        //- loading.hide();
+                    },
+                    success: function(data){
+                        var msg = data.message.type;
+                        if(msg == "success"){
+                            //- Clears The form fields
+                            form[0].reset();
+                            //- fires the toast
+                            Toast.fire({
+                                icon: data.message.type,
+                                title: data.message.info
+                            });
+                        }else{
+                            Toast.fire({
+                                icon: "error",
+                                title: "Oops! an error occured"
+                            });
+                        }
+                    },
+                    timeout: 5000,
+                    error: function (request, status, error) {
+                        alert(request.responseText);
+                        //- Toast.fire({
+                        //-     icon: "error",
+                        //-     title: "Oops! an error occured"
+                        //- });
+                    }
+
+                });
+            }
+        });
