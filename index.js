@@ -23,11 +23,11 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cors());
 
 app.get('/', (req, res) => {
-    res.render('home',{title:'Home'})
+    res.render('home', { title: 'Home' })
 })
 
 app.get('/payment', (req, res) => {
-    res.render('payment',{title:"Lipa"})
+    res.render('payment', { title: "Lipa" })
 })
 
 app.get('/access_token', (req, res) => {
@@ -103,18 +103,22 @@ app.post("/stk", generateToken, async (req, res) => {
         }
     ).then((response) => {
         console.log(response.data)
-        res.status(200).json(response.data)
+        // res.status(200).json(response.data)
+        res.redirect('/payment')
     })
         .catch((err) => {
             console.log(err.message)
-            res.status(400).json(err.message)
+            // res.status(400).json({err.message})
+            res.render('payment', { message: { type: 'error', info: err } })
         })
 
 
 })
 
+// app.get('/online_callback')
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+
 app.post('/callback', async (req, res) => {
     const callback_result = req.body;
     console.log(callback_result);
@@ -130,10 +134,10 @@ app.post('/callback', async (req, res) => {
     const datares = await { phone, transcId, ammount }
     console.log(datares)
     const payment = await prisma.payment.create({
-        data:{
-           transc_id:transcId,
-            amount:ammount,
-            number:phone
+        data: {
+            transc_id: transcId,
+            amount: ammount,
+            number: phone
         }
     })
 })

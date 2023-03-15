@@ -164,7 +164,7 @@ main.container
                                 Phone Number
 
                             //  Input 
-                            input.form-control(type="number" placeholder="E.g 07xxxx..",name='phone')
+                            input.form-control(type="number" placeholder="E.g 07xxxx..",name='phone',required)#phone
                     .col-12
                         //  Password 
                         .mb-4
@@ -181,7 +181,7 @@ main.container
                             //  / .row 
                             //  Input 
                             .input-group.input-group-merge
-                                input.form-control(type="number" autocomplete="off", data-toggle-password-input, placeholder="E.g 10",name="amount")
+                                input.form-control(type="number" autocomplete="off", data-toggle-password-input, placeholder="E.g 10",name="amount",required).amount
                                 //- button.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
                 //  / .row 
                 //- .form-check
@@ -196,18 +196,36 @@ main.container
                     .col-12
                         //  Button 
                         button.btn.w-100.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push 
-                            span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
+                            //- span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
                     .col-12
                         //  Link 
                         //- small.mb-0.text-muted
                             | Don't have an account yet? 
                             a.fw-semibold(href="sign-up-basic.html") Sign up
                 //  / .row 
-                //  / .row 
 
+    if (message)
+        script.
+            console.log(message)
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+            Toast.fire({
+                icon: message.type,
+                title:message.info.message
+            });
 //- main js
 script(src="assets/js/theme.bundle.js")
-script.
+
+//- script.
     var loading = $('#spina').hide();
     //- var submitbtn = $('#submit');
     //-  $(':input[type="submit"]').prop('disabled', true);
@@ -235,14 +253,14 @@ script.
         //- get form
         var form = $("#myForm");
         //- ajax call
-        if ($('input').val() == "") {
+        if ($('#phone').val() == "" || $('.amount').val() == "") {
             Toast.fire({
                 icon: "error",
                 title: "All fields are required"
             });
         }else{
             $.ajax({
-                url:"/dashboard/projects/new-project-api",
+                url:"/stk",
                 type:form.attr('method'),
                 data: form.serialize(),
                 beforeSend: function(){
@@ -257,15 +275,23 @@ script.
                     //- loading.hide();
                 },
                 success: function(data){
-                    var msg = data.message.type;
-                    if(msg == "success"){
-                        //- Clears The form fields
-                        form[0].reset();
-                        //- fires the toast
+                    var rescode = data.ResponseCode;
+                    //- alert(rescode);
+                    if(rescode == 0){
                         Toast.fire({
                             icon: data.message.type,
-                            title: data.message.info
+                            title:'Enter your mpesa password'
                         });
+                    //- }
+                    //- var msg = data.message.type;
+                    //- if(msg == "success"){
+                    //-     //- Clears The form fields
+                    //-     form[0].reset();
+                    //-     //- fires the toast
+                    //-     Toast.fire({
+                    //-         icon: data.message.type,
+                    //-         title: data.message.info
+                    //-     });
                     }else{
                         Toast.fire({
                             icon: "error",
