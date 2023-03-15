@@ -15,8 +15,8 @@ model User {
   email      String @unique
   first_name String @db.VarChar(50)
   last_name  String @db.VarChar(50)
-  created_at DateTime @default(now()) @db.Timestamp()
-  updated_at DateTime @default(now()) @db.Timestamp()
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
 }
 
 model payment {
@@ -24,6 +24,6 @@ model payment {
   number    BigInt
   transc_id String @db.VarChar(255)
   amount    BigInt
-  created_at DateTime @default(now()) @db.Timestamp()
-  updated_at DateTime @default(now()) @db.Timestamp()
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  updated_at DateTime @default(now()) @db.Timestamp(0)
 }

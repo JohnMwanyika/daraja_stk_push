@@ -121,7 +121,7 @@ app.post('/callback', async (req, res) => {
     if (!callback_result.Body.stkCallback.CallbackMetadata) {
         return res.json("ok");
     }
-    // console.log(callback_result.Body.stkCallback.CallbackMetadata);
+    console.log(callback_result.Body.stkCallback.CallbackMetadata);
 
     const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[3].Value
     const transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1].Value
