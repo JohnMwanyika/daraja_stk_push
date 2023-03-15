@@ -140,16 +140,16 @@ main.container
     .row.align-items-center.justify-content-center.vh-100
         .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
             //  Title 
-            h1.mb-2.text-center.
-
-                #{title} Na Mpesa
+            h1.mb-2.text-center
+                span
+                    img(src="assets/icon/lipanampesa.jpg",height="74px" alt="...")
 
             //  Subtitle 
             p.text-secondary.text-center.
 
                 Enter your phone number and amount to be paid
             //  Form 
-            form
+            form(action="/stk",method="post")
                 .row
                     .col-12
                         .mb-4
@@ -159,7 +159,7 @@ main.container
                                 Phone Number
 
                             //  Input 
-                            input.form-control(type="number" placeholder="E.g 07xxxx..")
+                            input.form-control(type="number" placeholder="E.g 07xxxx..",name='phone')
                     .col-12
                         //  Password 
                         .mb-4
@@ -172,11 +172,11 @@ main.container
 
                                 .col-auto
                                     //  Help text 
-                                    a.form-text.small.text-muted.link-primary(href="reset-password-illustration.html") Forgot password
+                                    //- a.form-text.small.text-muted.link-primary(href="reset-password-illustration.html") Forgot password
                             //  / .row 
                             //  Input 
                             .input-group.input-group-merge
-                                input.form-control(type="number" autocomplete="off", data-toggle-password-input, placeholder="E.g 10")
+                                input.form-control(type="number" autocomplete="off", data-toggle-password-input, placeholder="E.g 10",name="amount")
                                 button.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
                 //  / .row 
                 //- .form-check
@@ -190,7 +190,7 @@ main.container
                 .row.align-items-center.text-center
                     .col-12
                         //  Button 
-                        button.btn.w-100.btn-primary.mt-6.mb-2(type="button") Send push
+                        button.btn.w-100.btn-success.mt-6.mb-2(type="submit") Send push
                     .col-12
                         //  Link 
                         //- small.mb-0.text-muted
