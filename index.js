@@ -152,8 +152,8 @@ app.get('/registerurl', (req, res) => {
             // "ShortCode": "600610",
             ShortCode: process.env.MPESA_SHORT_CODE,
             ResponseType: "Completed",
-            ConfirmationURL: "https://lipa.onrender.com/confirm",
-            ValidationURL: "https://lipa.onrender.com/validate"
+            ConfirmationURL: "https://lipa.onrender.com/confirmation",
+            ValidationURL: "https://lipa.onrender.com/validation"
         },
         {
             headers: {
@@ -172,11 +172,11 @@ app.get('/registerurl', (req, res) => {
     })
 })
 
-app.post('/confirm', (req, res) => {
+app.post('/confirmation', (req, res) => {
     var results = req.body;
     console.log(results);
 })
-app.post('/validate', (req, res) => {
+app.post('/validation', (req, res) => {
     var results = req.body;
     console.log(results);
 })
