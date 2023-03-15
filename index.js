@@ -74,7 +74,7 @@ app.post("/stk", generateToken, async (req, res) => {
         ("0" + date.getSeconds()).slice(-2);
 
     // const shortcode = process.env.MPESA_SHORTCODE;
-    const shortcode = 174379;
+    const shortcode = process.env.MPESA_SHORT_CODE;
     const passkey = process.env.MPESA_PASSKEY;
 
     const password = Buffer.from(shortcode + passkey + timestap).toString('base64')
@@ -139,38 +139,37 @@ app.post('/callback', async (req, res) => {
             number: phone
         }
     })
-    .then((response)=>{
-        console.log(response)
-    })
+        .then((response) => {
+            console.log(response)
+        })
 });
 
-app.get('/register_url', async (req, res) => {
-    console.log('My token is',token);
-    await axios.post(
+app.get('/registerurl', (req, res) => {
+    // console.log('My token is',token);
+    axios.post(
         'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl',
         {
             // "ShortCode": "600610",
-            ShortCode: "600426",
-            ResponseType: "Cancelled",
+            ShortCode: process.env.MPESA_SHORT_CODE,
+            ResponseType: "Completed",
             ConfirmationURL: "https://lipa.onrender.com/confirm",
             ValidationURL: "https://lipa.onrender.com/validate"
         },
         {
             headers: {
-                Authorization: `Bearer ${token}`,
-                // 'Content-Type': 'application/json'
+                Authorization: `Bearer ${token}`
             }
         }
     )
-        .then((response) => {
-            console.log(response);
-            res.status(200).json({ response });
-        })
-        .catch((err) => {
-            if (err){
-                console.log(err.message)
-            }
-        })
+    .then((response) => {
+        console.log(response);
+        // res.status(200).json({ response });
+    })
+    .catch((err) => {
+        if (err) {
+            console.log(err.message)
+        }
+    })
 })
 
 app.post('/confirm', (req, res) => {
