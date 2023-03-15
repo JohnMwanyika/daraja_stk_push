@@ -30,9 +30,9 @@ app.get('/payment', (req, res) => {
     res.render('payment', { title: "Lipa" })
 })
 
-app.get('/access_token', (req, res) => {
-    generateToken();
-})
+// app.get('/access_token', (req, res) => {
+//     generateToken();
+// })
 
 // middleware function to generate token 
 const generateToken = async (req, res, next) => {
@@ -41,10 +41,7 @@ const generateToken = async (req, res, next) => {
     let consumer = process.env.MPESA_CONSUMER_KEY;
 
     let auth = Buffer.from(`${consumer}:${secret}`).toString('base64');
-    console.log(auth)
-    let decauth = Buffer.from(auth, 'base64').toString('ascii');
-    console.log(decauth)
-
+    // console.log(auth)
 
     await axios.get("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
         headers: {
@@ -60,6 +57,8 @@ const generateToken = async (req, res, next) => {
     })
 
 }
+
+app.use(generateToken);
 
 app.post("/stk", generateToken, async (req, res) => {
     const phone = req.body.phone.substring(1)
@@ -140,4 +139,45 @@ app.post('/callback', async (req, res) => {
             number: phone
         }
     })
+    .then((response)=>{
+        console.log(response)
+    })
+});
+
+app.get('/register_url', async (req, res) => {
+    console.log('My token is',token);
+    await axios.post(
+        'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl',
+        {
+            // "ShortCode": "600610",
+            ShortCode: "600426",
+            ResponseType: "Cancelled",
+            ConfirmationURL: "https://lipa.onrender.com/confirm",
+            ValidationURL: "https://lipa.onrender.com/validate"
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                // 'Content-Type': 'application/json'
+            }
+        }
+    )
+        .then((response) => {
+            console.log(response);
+            res.status(200).json({ response });
+        })
+        .catch((err) => {
+            if (err){
+                console.log(err.message)
+            }
+        })
+})
+
+app.post('/confirm', (req, res) => {
+    var results = req.body;
+    console.log(results);
+})
+app.post('/validate', (req, res) => {
+    var results = req.body;
+    console.log(results);
 })
