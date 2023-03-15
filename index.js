@@ -92,7 +92,7 @@ app.post("/stk", generateToken, async (req, res) => {
             PartyA: `254${phone}`,
             PartyB: shortcode,
             PhoneNumber: `254${phone}`,
-            CallBackURL: "https://745f-41-76-168-156.in.ngrok.io/callback",
+            CallBackURL: "https://lipa.onrender.com/callback",
             AccountReference: `lipa_na_nodejs`, // Account number used when paying
             TransactionDesc: "Test"
         },
