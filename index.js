@@ -1,10 +1,18 @@
 require('dotenv').config();
 const express = require('express');
 const axios = require('axios')
+var path = require('path');
 
 const app = express();
 const cors = require('cors')
 const port = process.env.PORT
+
+// serving static files
+app.use(express.static(path.join(__dirname, "public")));
+app.use("assets", express.static("/public/assets/"));
+// setting view template engine
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "pug");
 
 app.listen(port, () => {
     console.log(`app listening on localhost: ${port}`);
@@ -15,7 +23,11 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cors());
 
 app.get('/', (req, res) => {
-    res.send('ello mundo')
+    res.render('home',{title:'Home'})
+})
+
+app.get('/payment', (req, res) => {
+    res.render('payment',{title:"Lipa"})
 })
 
 app.get('/access_token', (req, res) => {
@@ -80,7 +92,7 @@ app.post("/stk", generateToken, async (req, res) => {
             PartyA: `254${phone}`,
             PartyB: shortcode,
             PhoneNumber: `254${phone}`,
-            CallBackURL: "https://lipa.onrender.com/callback",
+            CallBackURL: "https://745f-41-76-168-156.in.ngrok.io/callback",
             AccountReference: `lipa_na_nodejs`, // Account number used when paying
             TransactionDesc: "Test"
         },
@@ -111,12 +123,12 @@ app.post('/callback', async (req, res) => {
     }
     // console.log(callback_result.Body.stkCallback.CallbackMetadata);
 
-    const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[3]
-    const transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1]
-    const ammount = callback_result.Body.stkCallback.CallbackMetadata.Item[0]
+    const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[3].Value
+    const transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1].Value
+    const ammount = callback_result.Body.stkCallback.CallbackMetadata.Item[0].Value
 
-    const data = { phone, transcId, ammount }
-    console.log(data)
+    const datares = await { phone, transcId, ammount }
+    console.log(datares)
     const payment = await prisma.payment.create({
         data:{
            transc_id:transcId,
@@ -124,5 +136,4 @@ app.post('/callback', async (req, res) => {
             number:phone
         }
     })
-
 })
