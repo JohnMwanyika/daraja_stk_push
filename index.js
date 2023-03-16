@@ -96,7 +96,7 @@ app.post("/stk", generateToken, async (req, res) => {
             PartyB: shortcode, //paybill number
             PhoneNumber: `254${phone}`, // initiator phone number
             CallBackURL: process.env.CALL_BACK_URL,
-            AccountReference: `lipaonrender`, // Account number used when paying
+            AccountReference: `254${phone}`, // Account number used when paying
             TransactionDesc: "Test" //description which is optional
         },
         {
@@ -147,8 +147,10 @@ app.post('/callback', async (req, res) => {
     })
         .then((response) => {
             console.log(response);
+            let phone = parseInt(response.number);
+            let amount = parseInt(response.amount)
             // send text to user
-            sendSms(response.number,`Hello ${response.number} your payment of ${response.amount} has been received for account number ${response.number}`)
+            sendSms(phone,`Hello ${phone} your payment of ${amount} has been received for account number ${phone}`)
             res.json({'response':response});
         })
         .catch((err)=>{
