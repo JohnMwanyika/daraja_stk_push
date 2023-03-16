@@ -183,26 +183,13 @@ main.container
                             .input-group.input-group-merge
                                 input.form-control(type="number" autocomplete="off", data-toggle-password-input, placeholder="E.g 10",name="amount",required).amount
                                 //- button.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
-                //  / .row 
-                //- .form-check
-                    //  Input 
-                    input.form-check-input#remember(type="checkbox")
-                    //  Label 
-                    label.form-check-label(for="remember").
-
-                        Remember me
 
                 .row.align-items-center.text-center
                     .col-12
-                        //  Button 
+                        //-   Button 
                         button.btn.w-100.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push 
-                            //- span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
+                            span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
                     .col-12
-                        //  Link 
-                        //- small.mb-0.text-muted
-                            | Don't have an account yet? 
-                            a.fw-semibold(href="sign-up-basic.html") Sign up
-                //  / .row 
 
     if (message)
         script.
@@ -225,7 +212,7 @@ main.container
 //- main js
 script(src="assets/js/theme.bundle.js")
 
-//- script.
+script.
     var loading = $('#spina').hide();
     //- var submitbtn = $('#submit');
     //-  $(':input[type="submit"]').prop('disabled', true);
@@ -252,11 +239,21 @@ script(src="assets/js/theme.bundle.js")
         event.preventDefault();
         //- get form
         var form = $("#myForm");
-        //- ajax call
+        //- make sure empty form is not submitted
         if ($('#phone').val() == "" || $('.amount').val() == "") {
             Toast.fire({
                 icon: "error",
                 title: "All fields are required"
+            });
+        }else if ($('#phone').val().length < 10 ){
+            Toast.fire({
+                icon: "error",
+                title: "Enter a valid phone number..."
+            });
+        }else if ($('.amount').val() < 1){
+            Toast.fire({
+                icon: "error",
+                title: "Invalid amount",
             });
         }else{
             $.ajax({
@@ -272,42 +269,39 @@ script(src="assets/js/theme.bundle.js")
                     loading.hide(function(){
                         $("#submitbtn").removeAttr('disabled');
                     });
-                    //- loading.hide();
                 },
                 success: function(data){
-                    var rescode = data.ResponseCode;
-                    //- alert(rescode);
-                    if(rescode == 0){
+                    let rescode = data.response.ResponseCode;
+                    console.log(data.response.ResponseCode)
+                    //- alert(data);
+                    if(data.response.ResponseCode == '0'){
+                        //- Clears The form fields
+                        form[0].reset();
                         Toast.fire({
-                            icon: data.message.type,
-                            title:'Enter your mpesa password'
+                            //- icon: data.message.type,
+                            icon: 'warning',
+                            title:'Enter your mpesa password...',
+                            timer:false
                         });
-                    //- }
-                    //- var msg = data.message.type;
-                    //- if(msg == "success"){
-                    //-     //- Clears The form fields
-                    //-     form[0].reset();
-                    //-     //- fires the toast
-                    //-     Toast.fire({
-                    //-         icon: data.message.type,
-                    //-         title: data.message.info
-                    //-     });
                     }else{
                         Toast.fire({
                             icon: "error",
-                            title: "Oops! an error occured"
+                            title: "Oops! an error occured try again"
                         });
                     }
                 },
-                timeout: 5000,
+                timeout: 10000,
                 error: function (request, status, error) {
-                    alert(request.responseText);
-                    //- Toast.fire({
-                    //-     icon: "error",
-                    //-     title: "Oops! an error occured"
-                    //- });
+                    //- alert(request,status);
+                    Toast.fire({
+                        icon: "error",
+                        title: "Request time out try again!"
+                    });
                 }
 
             });
         }
     });
+
+
+

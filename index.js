@@ -58,12 +58,15 @@ const generateToken = async (req, res, next) => {
 
 }
 
+// middleware to geenerate access token on every request
 app.use(generateToken);
 
+// Sending the stk push tothe provided credentials on the rquest body
 app.post("/stk", generateToken, async (req, res) => {
     const phone = req.body.phone.substring(1)
     const amount = req.body.amount
 
+    // geerating timestamp using vanilla js
     const date = new Date();
     const timestap =
         date.getFullYear() +
@@ -73,49 +76,49 @@ app.post("/stk", generateToken, async (req, res) => {
         ("0" + date.getMinutes()).slice(-2) +
         ("0" + date.getSeconds()).slice(-2);
 
-    // const shortcode = process.env.MPESA_SHORTCODE;
     const shortcode = process.env.MPESA_SHORT_CODE;
     const passkey = process.env.MPESA_PASSKEY;
 
+    // creating the password by concatenating the three and converting it to base 8
     const password = Buffer.from(shortcode + passkey + timestap).toString('base64')
 
+    // sending a post request to fafaricom with our credentials 
     await axios.post(
         "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
         {
-            // "BusinessShortCode": "174379",
             BusinessShortCode: shortcode,
             Password: password,
             Timestamp: timestap,
-            TransactionType: "CustomerPayBillOnline", // "CustomerBuyGoodsOnline"
+            TransactionType: "CustomerPayBillOnline", // you can also use "CustomerBuyGoodsOnline"
             Amount: amount,
-            PartyA: `254${phone}`,
-            PartyB: shortcode,
-            PhoneNumber: `254${phone}`,
+            PartyA: `254${phone}`, // initiator phone number
+            PartyB: shortcode, //paybill number
+            PhoneNumber: `254${phone}`, // initiator phone number
             CallBackURL: "https://lipa.onrender.com/callback",
             AccountReference: `lipa_na_nodejs`, // Account number used when paying
-            TransactionDesc: "Test"
+            TransactionDesc: "Test" //description which is optional
         },
         {
             headers: {
-                Authorization: `Bearer ${token}` //token generated everytime you send a request to safaricom
+                Authorization: `Bearer ${token}` // token generated everytime you send a request to safaricom,, this is comming from the middleware I created above
             }
         }
     ).then((response) => {
         console.log(response.data)
-        // res.status(200).json(response.data)
-        res.redirect('/payment')
+        res.json({'response':response.data})
+        // res.redirect('/payment')
     })
         .catch((err) => {
             console.log(err.message)
-            // res.status(400).json({err.message})
-            res.render('payment', { message: { type: 'error', info: err } })
+            res.json({ message: { type: 'error', info: err } })
+            // res.render('payment', { message: { type: 'error', info: err } })
         })
 
 
 })
 
 // app.get('/online_callback')
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require("@prisma/client"); //this is where db transaction recording  begins
 const prisma = new PrismaClient();
 
 app.post('/callback', async (req, res) => {
@@ -173,7 +176,7 @@ app.get('/registerurl', (req, res) => {
 })
 
 app.post('/confirmation', (req, res) => {
-    var results = req.body;
+    const results = req.body;
     console.log(results);
 })
 app.post('/validation', (req, res) => {
