@@ -95,7 +95,7 @@ app.post("/stk", generateToken, async (req, res) => {
             PartyA: `254${phone}`, // initiator phone number
             PartyB: shortcode, //paybill number
             PhoneNumber: `254${phone}`, // initiator phone number
-            CallBackURL: "https://93de-41-76-168-156.in.ngrok.io/callback",
+            CallBackURL: process.env.CALL_BACK_URL,
             AccountReference: `lipaonrender`, // Account number used when paying
             TransactionDesc: "Test" //description which is optional
         },
