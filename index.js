@@ -1,11 +1,17 @@
 require('dotenv').config();
 const express = require('express');
-const axios = require('axios')
+const axios = require('axios');
 var path = require('path');
 
 const app = express();
 const cors = require('cors')
-const port = process.env.PORT
+const port = process.env.PORT;
+
+const session = require('express-session');
+const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
+const { PrismaClient } = require("@prisma/client"); //this is where db transaction recording  begins
+const prisma = new PrismaClient();
+
 
 // serving static files
 app.use(express.static(path.join(__dirname, "public")));
@@ -31,9 +37,19 @@ app.get('/payment', (req, res) => {
     res.render('payment', { title: "Lipa" })
 })
 
-// app.get('/access_token', (req, res) => {
-//     generateToken();
-// })
+app.use(
+    session({
+      secret: "thisismysecretnooneknowsmysecrethahah",
+      saveUninitialized: false,
+      store: new PrismaSessionStore(new PrismaClient(), {
+        checkPeriod: 2 * 60 * 1000, //ms
+        dbRecordIdIsSessionId: true,
+        dbRecordIdFunction: undefined,
+      }),
+      // cookie: { maxAge: 100000 },
+      resave: false,
+    })
+  );
 
 // middleware function to generate token 
 const generateToken = async (req, res, next) => {
@@ -119,8 +135,8 @@ app.post("/stk", generateToken, async (req, res) => {
 })
 
 // app.get('/online_callback')
-const { PrismaClient } = require("@prisma/client"); //this is where db transaction recording  begins
-const prisma = new PrismaClient();
+// const { PrismaClient } = require("@prisma/client"); //this is where db transaction recording  begins
+// const prisma = new PrismaClient();
 // import sms utility
 const sendSms = require('./utils/sendSms')
 

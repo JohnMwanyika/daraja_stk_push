@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,20 +7,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id         Int    @id @default(autoincrement())
-  email      String @unique
-  first_name String @db.VarChar(50)
-  last_name  String @db.VarChar(50)
-  created_at DateTime @default(now()) @db.Timestamp(0)
-  updated_at DateTime @default(now()) @db.Timestamp(0)
+model user {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique(map: "User_email_key")
+  first_name String    @db.VarChar(50)
+  last_name  String    @db.VarChar(50)
+  created_at DateTime  @default(now()) @db.Timestamp(0)
+  updated_at DateTime  @default(now()) @db.Timestamp(0)
+  phone      Int
+  payment    payment[]
 }
 
 model payment {
-  id        Int    @id @default(autoincrement())
-  number    BigInt
-  transc_id String @db.VarChar(255)
-  amount    BigInt
+  id         Int      @id @default(autoincrement())
+  number     BigInt
+  transc_id  String   @db.VarChar(255)
+  amount     BigInt
   created_at DateTime @default(now()) @db.Timestamp(0)
   updated_at DateTime @default(now()) @db.Timestamp(0)
+  userId     Int?
+  user_id    user?    @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId], map: "payment_userId_fkey")
+}
+
+model session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
 }
