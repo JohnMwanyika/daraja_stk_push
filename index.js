@@ -143,16 +143,20 @@ const sendSms = require('./utils/sendSms')
 app.post('/callback', async (req, res) => {
     const callback_result = req.body;
     console.log(callback_result);
+    //weather or not the transaction is successful Safaricom will post to the callback route
+    // - if transaction is successful the callback will contain the CallbackMetadata and vice-versa
+    // so, if it doesnt contain the callbackMetadata we respond to safaricom by telling them we are ok so that it doesnt keep reposting
     if (!callback_result.Body.stkCallback.CallbackMetadata) {
         return res.json("ok");
     }
+    // - else we receive the callbackMetadata and store the information to our db
     console.log(callback_result.Body.stkCallback.CallbackMetadata);
 
-    const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[3].Value
+    const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value
     const transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1].Value
     const ammount = callback_result.Body.stkCallback.CallbackMetadata.Item[0].Value
 
-    const datares = await { phone, transcId, ammount }
+    // const datares = await { phone, transcId, ammount }
     console.log(datares)
     const payment = await prisma.payment.create({
         data: {
