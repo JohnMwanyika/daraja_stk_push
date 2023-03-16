@@ -27,6 +27,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/payment', (req, res) => {
+    console.log('New payment request comming...')
     res.render('payment', { title: "Lipa" })
 })
 
@@ -94,8 +95,8 @@ app.post("/stk", generateToken, async (req, res) => {
             PartyA: `254${phone}`, // initiator phone number
             PartyB: shortcode, //paybill number
             PhoneNumber: `254${phone}`, // initiator phone number
-            CallBackURL: "https://lipa.onrender.com/callback",
-            AccountReference: `lipa_na_nodejs`, // Account number used when paying
+            CallBackURL: "https://93de-41-76-168-156.in.ngrok.io/callback",
+            AccountReference: `lipaonrender`, // Account number used when paying
             TransactionDesc: "Test" //description which is optional
         },
         {
@@ -120,6 +121,8 @@ app.post("/stk", generateToken, async (req, res) => {
 // app.get('/online_callback')
 const { PrismaClient } = require("@prisma/client"); //this is where db transaction recording  begins
 const prisma = new PrismaClient();
+// import sms utility
+const sendSms = require('./utils/sendSms')
 
 app.post('/callback', async (req, res) => {
     const callback_result = req.body;
@@ -143,9 +146,18 @@ app.post('/callback', async (req, res) => {
         }
     })
         .then((response) => {
-            console.log(response)
+            console.log(response);
+            // send text to user
+            sendSms(response.number,`Hello ${response.number} your payment of ${response.amount} has been received for account number ${response.number}`)
+            res.json({'response':response});
+        })
+        .catch((err)=>{
+            console.log(err.message);
         })
 });
+
+// // Getting feedback
+// app.get('/callback')
 
 app.get('/registerurl', (req, res) => {
     // console.log('My token is',token);

@@ -245,7 +245,7 @@ script.
                 icon: "error",
                 title: "All fields are required"
             });
-        }else if ($('#phone').val().length < 10 ){
+        }else if ($('#phone').val().length != 10 ){
             Toast.fire({
                 icon: "error",
                 title: "Enter a valid phone number..."
@@ -269,6 +269,7 @@ script.
                     loading.hide(function(){
                         $("#submitbtn").removeAttr('disabled');
                     });
+                    //- listenToCallback();
                 },
                 success: function(data){
                     let rescode = data.response.ResponseCode;
@@ -304,4 +305,50 @@ script.
     });
 
 
-
+    function listenToCallback(){
+        $.ajax({
+            url:"/callback",
+            type:'post',
+            beforeSend: function(){
+                Toast.fire({
+                    icon: 'warning',
+                    title:'Processing payment...',
+                    timer:false
+                });
+            },
+            complete: function(status){
+                //- Toast.fire({
+                //-     icon: 'warning',
+                //-     title: status,
+                //-     //- timer:false
+                //- });
+            },
+            success: function(data){
+                let rescode = data.response;
+                console.log(data.response)
+                alert(data.response);
+            //-     if(data.response.ResponseCode == '0'){
+            //-         //- Clears The form fields
+            //-         form[0].reset();
+            //-         Toast.fire({
+            //-             icon: 'warning',
+            //-             title:'Enter your mpesa password',
+            //-             timer:false
+            //-         });
+            //-     }else{
+            //-         Toast.fire({
+            //-             icon: "error",
+            //-             title: "Oops! an error occured try again"
+            //-         });
+            //-     }
+            },
+            timeout: 10000,
+            error: function (request, status, error) {
+                //- alert(request,status);
+                Toast.fire({
+                    icon: "error",
+                    title: "Request time out try again!"
+                });
+            }
+        });
+    }
