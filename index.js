@@ -39,17 +39,17 @@ app.get('/payment', (req, res) => {
 
 app.use(
     session({
-      secret: "thisismysecretnooneknowsmysecrethahah",
-      saveUninitialized: false,
-      store: new PrismaSessionStore(new PrismaClient(), {
-        checkPeriod: 2 * 60 * 1000, //ms
-        dbRecordIdIsSessionId: true,
-        dbRecordIdFunction: undefined,
-      }),
-      // cookie: { maxAge: 100000 },
-      resave: false,
+        secret: "thisismysecretnooneknowsmysecrethahah",
+        saveUninitialized: false,
+        store: new PrismaSessionStore(new PrismaClient(), {
+            checkPeriod: 2 * 60 * 1000, //ms
+            dbRecordIdIsSessionId: true,
+            dbRecordIdFunction: undefined,
+        }),
+        // cookie: { maxAge: 100000 },
+        resave: false,
     })
-  );
+);
 
 // middleware function to generate token 
 const generateToken = async (req, res, next) => {
@@ -122,7 +122,7 @@ app.post("/stk", generateToken, async (req, res) => {
         }
     ).then((response) => {
         console.log(response.data)
-        res.json({'response':response.data})
+        res.json({ 'response': response.data })
         // res.redirect('/payment')
     })
         .catch((err) => {
@@ -138,7 +138,7 @@ app.post("/stk", generateToken, async (req, res) => {
 // const { PrismaClient } = require("@prisma/client"); //this is where db transaction recording  begins
 // const prisma = new PrismaClient();
 // import sms utility
-const sendSms = require('./utils/sendSms')
+const sendSms = require('./utils/sendSms');
 
 app.post('/callback', async (req, res) => {
     const callback_result = req.body;
@@ -152,12 +152,10 @@ app.post('/callback', async (req, res) => {
     // - else we receive the callbackMetadata and store the information to our db
     console.log(callback_result.Body.stkCallback.CallbackMetadata);
 
-    const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value
+    const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[3].Value
     const transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1].Value
     const ammount = callback_result.Body.stkCallback.CallbackMetadata.Item[0].Value
 
-    // const datares = await { phone, transcId, ammount }
-    console.log(datares)
     const payment = await prisma.payment.create({
         data: {
             transc_id: transcId,
@@ -167,13 +165,13 @@ app.post('/callback', async (req, res) => {
     })
         .then((response) => {
             console.log(response);
-            let phone = parseInt(response.number);
+            let recipient = parseInt(response.number);
             let amount = parseInt(response.amount)
             // send text to user
-            sendSms(phone,`Hello ${phone} your payment of ${amount} has been received for account number ${phone}`)
-            res.json({'response':response});
+            sendSms(phone, `Hello ${recipient} your payment of ${amount} has been received for account number ${recipient}`)
+            // res.json({ 'response': response });
         })
-        .catch((err)=>{
+        .catch((err) => {
             console.log(err.message);
         })
 });
@@ -194,19 +192,21 @@ app.get('/registerurl', (req, res) => {
         },
         {
             headers: {
+                'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`
             }
         }
     )
-    .then((response) => {
-        console.log(response);
-        // res.status(200).json({ response });
-    })
-    .catch((err) => {
-        if (err) {
-            console.log(err.message)
-        }
-    })
+        .then((response) => {
+            console.log(response.data);
+            const data = response.data;
+            res.json({ 'response': data });
+        })
+        .catch((err) => {
+            if (err) {
+                console.log(err.message)
+            }
+        })
 })
 
 app.post('/confirmation', (req, res) => {
