@@ -3,8 +3,8 @@ const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 module.exports = {
   loginForm: (req, res) => {
-    sess = req.session;
-    console.log(sess);
+    // sess = req.session;
+    // console.log(sess);
     res.render("signin", { title: 'Sign in to Lipa' });
   },
   signUp: async (req, res) => {
@@ -71,6 +71,7 @@ module.exports = {
 
       if (!user) {
         return res.render("signin", {
+        // return res.json( {
           Swal: require("sweetalert2"),
           message: {
             info: "No user with the supplied username",
@@ -85,14 +86,9 @@ module.exports = {
         if (err) throw err;
 
         if (result) {
-          if (password == "1234") {
-            req.session.pass = password;
-            // res.redirect("/dashboard");
-          }
           // setting the user session
           req.session.user = user;
-          console.log(req.session.user, req.session.pass);
-          // return res.status(200).redirect("/dashboard");
+          console.log(req.session.user);
           return res.status(200).redirect("/dashboard");
         } else {
           return res.render("signin", {
@@ -131,11 +127,12 @@ module.exports = {
       });
 
       if (!user) {
-        return res.render("signin", {
+        // return res.render("signin", {
+        return res.json({
           Swal: require("sweetalert2"),
           message: {
             info: "No user with the supplied email",
-            type: "error",
+            type: "warning",
           },
           fire: "fire",
         });
@@ -144,17 +141,18 @@ module.exports = {
       //   validate passswords this function returns true or false as the result when the passwords match
       bcrypt.compare(password, user.password, (err, result) => {
         if (err) throw err;
-
+        console.log(result)
+        console.log(user)
         if (result) {
           // setting the user session
           req.session.user = user;
           console.log(req.session.user);
           return res.status(200).json({
-            messages: { info: "Login successfull redirecting...", type: "success" },
+            message: { info: "Login successfull redirecting...", type: "success" },
           });
         } else {
-          return res.json({
-            messages: { info: "Invalid Credentials", type: "alert-danger" },
+          return res.status(200).json({
+            message: { info: "Invalid Credentials", type: "error" },
           });
         }
       });

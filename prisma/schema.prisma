@@ -54,6 +54,6 @@ model bill_status {
 model session {
   id        String   @id
   sid       String   @unique
-  data      String
+  data      String   @db.Text
   expiresAt DateTime
 }

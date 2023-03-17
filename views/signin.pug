@@ -21,12 +21,12 @@ body(class="d-flex align-items-center bg-light-green")
             .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
                 h1.mb-2.text-center #{title}
                 p.text-secondary.text-center Enter your email address and password to create your session.
-                form#login(method="post")
+                form#login(method="post",action="/api/signin")
                     .row
                         .col-12
                             .mb-4
                                 label.form-label Email Address
-                                input.form-control(type="email" placeholder="Your email address" name="email")
+                                input.form-control#email(type="email" placeholder="Your email address" name="email")
                         .col-12
                             .mb-4
                                 .row
@@ -35,19 +35,21 @@ body(class="d-flex align-items-center bg-light-green")
                                     .col-auto
                                         a.form-text.small.text-muted.link-primary(href="#") Forgot password
                                 .input-group
-                                    input.form-control.rounded(type="password" autocomplete="off", data-toggle-password-input, placeholder="Your password" name="password")
+                                    input#pass.form-control.rounded(type="password" autocomplete="off", data-toggle-password-input, placeholder="Your password" name="password")
                                     button.rounded.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
                     //- .form-check
                         input.form-check-input#remember(type="checkbox")
                         label.form-check-label(for="remember") Remember me
                     .row.align-items-center.text-center
                         .col-12
-                            button.btn.w-100.btn-warning.mt-6.mb-2#submitbtn(type="submit") Sign in
+                            button.btn.w-100.btn-warning.mt-6.mb-2#submitbtn(type="submit") Sign in 
+                                span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
+
                         .col-12
                             small.mb-0.text-muted
                                 | Don't have an account yet? 
                                 a.text-success.fw-semibold(href="/signup") Sign up
-    if (message)
+    //- if (message)
         script.
             const Toast = Swal.mixin({
                 toast: true,
@@ -66,7 +68,7 @@ body(class="d-flex align-items-center bg-light-green")
                 title: "#{message.info}"
             });
 
-    script(src="assets/js/theme.bundle.js")
+    //- script(src="assets/js/theme.bundle.js")
 
     script.
         var Toast = Swal.mixin({
@@ -81,23 +83,26 @@ body(class="d-flex align-items-center bg-light-green")
             }
         })
 
+        let loader = $('#spina').hide();
         $("#login").submit(function(event){
             event.preventDefault();
             //- get form
             var form = $("#login");
             //- ajax call
-            if ($('input').val() == "") {
+
+            if ($('#email').val() == "" || $('#pass').val() == "") {
                 Toast.fire({
                     icon: "error",
-                    title: "All fields are required"
+                    title: "All fields are required",
+                    timer:3000
                 });
             }else{
                 $.ajax({
-                    url:"/api/signIn",
+                    url:form.attr('action'),
                     type:form.attr('method'),
                     data: form.serialize(),
                     beforeSend: function(){
-                        loading.show(function(){
+                        loader.show(function(){
                             $("#submitbtn").prop("disabled", true);
                         });
                         Toast.fire({
@@ -105,33 +110,35 @@ body(class="d-flex align-items-center bg-light-green")
                         });
                     },
                     complete: function(){
-                        //- Toast.fire({
-                        //-     title: "Login Sucess!!"
-                        //- });
+                        loader.hide(function(){
+                            $("#submitbtn").removeAttr('disabled');
+                        });
                     },
                     success: function(data){
-                        var msg = data.messages.type;
+                        let msg = data.message.type;
+                        //- alert(msg)
                         if(msg == "success"){
-                            //- Clears The form fields
                             //- fires the toast
                             Toast.fire({
-                                icon: data.messages.type,
-                                title: data.messages.info
+                                icon: data.message.type,
+                                title: data.message.info,
+                                timer:3000
                             });
+                            form[0].reset();
                             window.location.href = '/payment'
                         }else{
                             Toast.fire({
                                 icon: "error",
-                                title: data.messages.info
+                                title: data.message.info,
+                                timer:3000
                             });
-                            form[0].reset();
                         }
                     },
-                    timeout: 5000,
+                    timeout: 6000,
                     error: function (request, status, error) {
                         Toast.fire({
                             icon: "error",
-                            title: "Oops! an error occured try again"
+                            title: "Request timeout, try again!"
                         });
                     }
 

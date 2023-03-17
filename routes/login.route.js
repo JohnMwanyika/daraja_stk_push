@@ -17,7 +17,7 @@ router.get("/", loginForm);
 router.post("/signup", signUp);
 router.post("/login", signIn);
 router.get("/logout", signOut);
-router.post("/api/signIn", signInApi);
+router.post("/api/signin", signInApi);
 
 // dashboard routes
 // router.use("/dashboard", dashboardRoute);

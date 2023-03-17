@@ -6,39 +6,21 @@ var path = require('path');
 const app = express();
 const cors = require('cors')
 const port = process.env.PORT;
-
-const session = require('express-session');
+// session should always be a variable for it is reassignable
+var session = require('express-session');
 const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
 const { PrismaClient } = require("@prisma/client"); //this is where db transaction recording  begins
-const prisma = new PrismaClient();
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }))
+app.use(cors());
 // serving static files
 app.use(express.static(path.join(__dirname, "public")));
 app.use("assets", express.static("/public/assets/"));
 // setting view template engine
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
-
-app.listen(port, () => {
-    console.log(`app listening on localhost: ${port}`);
-});
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
-app.use(cors());
-
-const signinRoute = require('./routes/login.route');
-app.use('/',signinRoute)
-
-app.get('/signup', (req, res) => {
-    res.render('signup', { title: 'Sign up to Lipa' })
-})
-
-app.get('/payment', (req, res) => {
-    console.log('New payment request comming...')
-    res.render('payment', { title: "Lipa" })
-})
-
+// initialize and configure session store middleware
 app.use(
     session({
         secret: "thisismysecretnooneknowsmysecrethahah",
@@ -52,6 +34,24 @@ app.use(
         resave: false,
     })
 );
+const prisma = new PrismaClient();
+
+
+app.listen(port, () => {
+    console.log(`app listening on localhost: ${port}`);
+});
+
+const signinRoute = require('./routes/login.route');
+app.use('/',signinRoute)
+
+app.get('/signup', (req, res) => {
+    res.render('signup', { title: 'Sign up to Lipa' })
+})
+
+app.get('/payment', (req, res) => {
+    console.log(`${req.session.user.first_name} visited the payment page`)
+    res.render('payment', { title: "Lipa" })
+})
 
 // middleware function to generate token 
 const generateToken = async (req, res, next) => {
