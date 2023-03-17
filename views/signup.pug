@@ -17,31 +17,55 @@ body(class="d-flex align-items-center bg-light-green")
         .row.align-items-center.justify-content-center.vh-100
             .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
                 h1.mb-2.text-center #{title}
-                p.text-secondary.text-center Enter your email address and password to create your session.
-                form
-                    .row
-                        .col-12
-                            .mb-4
-                                label.form-label Email Address
-                                input.form-control(type="email" placeholder="Your email address")
-                        .col-12
-                            .mb-4
-                                .row
-                                    .col
-                                        label.form-label Password
-                                    .col-auto
-                                        a.form-text.small.text-muted.link-primary(href="#") Forgot password
-                                .input-group
-                                    input.form-control.rounded(type="password" autocomplete="off", data-toggle-password-input, placeholder="Your password")
-                                    button.rounded.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
-                    //- .form-check
-                        input.form-check-input#remember(type="checkbox")
-                        label.form-check-label(for="remember") Remember me
-                    .row.align-items-center.text-center
-                        .col-12
-                            button.btn.w-100.btn-warning.mt-6.mb-2(type="button") Sign in
-                        .col-12
-                            small.mb-0.text-muted
-                                | Don't have an account yet? 
-                                a.text-success.fw-semibold(href="sign-up-basic.html") Sign up
+                p.text-secondary.text-center Fill in the form to create your account.
+                    form(action='#', method='post')
+                        .row
+                            .col-12
+                                .mb-4
+                                    label.form-label.
+
+                                        Full name
+
+                                    input.form-control(type="text" placeholder="Your full name")
+                            .col-12
+                                .mb-4
+                                    label.form-label.
+
+                                        Email Address
+
+                                    input.form-control(type="email" placeholder="Your email address")
+                        .row
+                            .col-12
+                                .mb-4
+                                    label.form-label.
+
+                                        Password
+
+                                    .input-group
+                                        input.rounded.form-control(type="password" autocomplete="off", data-toggle-password-input, placeholder="Your password")
+                                        button.rounded.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
+                            .col-12
+                                .mb-4
+                                    label.form-label.
+
+                                        Confirm password
+
+                                    .input-group
+                                        input.rounded.form-control(type="password" autocomplete="off", data-toggle-password-input, placeholder="Your password again")
+                                        button.rounded.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
+                        //- .form-check
+                            input.form-check-input#agree(type="checkbox")
+                            label.form-check-label(for="agree")
+                                | I agree with 
+                                a(href="javascript: void(0);") Terms & Conditions
+                                |  and have understood 
+                                a(href="javascript: void(0);") Privacy Policy
+                        .row.align-items-center.text-center
+                            .col-12
+                                button.btn.w-100.btn-warning.mt-6.mb-2(type="button") Get started
+                            .col-12
+                                small.mb-0.text-muted
+                                    | Already registered? 
+                                    a.text-info.fw-semibold(href="/") Login
+
     script(src="assets/js/theme.bundle.js")
