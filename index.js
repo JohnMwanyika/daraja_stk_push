@@ -152,7 +152,7 @@ app.post('/callback', async (req, res) => {
     // - else we receive the callbackMetadata and store the information to our db
     console.log(callback_result.Body.stkCallback.CallbackMetadata);
 
-    const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[3].Value
+    const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value
     const transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1].Value
     const ammount = callback_result.Body.stkCallback.CallbackMetadata.Item[0].Value
 
