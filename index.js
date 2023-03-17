@@ -12,7 +12,6 @@ const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
 const { PrismaClient } = require("@prisma/client"); //this is where db transaction recording  begins
 const prisma = new PrismaClient();
 
-
 // serving static files
 app.use(express.static(path.join(__dirname, "public")));
 app.use("assets", express.static("/public/assets/"));
@@ -28,11 +27,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use(cors());
 
-app.get('/', (req, res) => {
-    res.render('signin', { title: 'Sign in' })
-})
+const signinRoute = require('./routes/login.route');
+app.use('/',signinRoute)
+
 app.get('/signup', (req, res) => {
-    res.render('signup', { title: 'Sign up' })
+    res.render('signup', { title: 'Sign up to Lipa' })
 })
 
 app.get('/payment', (req, res) => {
@@ -142,6 +141,7 @@ app.post("/stk", generateToken, async (req, res) => {
 // const prisma = new PrismaClient();
 // import sms utility
 const sendSms = require('./utils/sendSms');
+const { signIn } = require('./controllers/login.controller');
 
 app.post('/callback', async (req, res) => {
     const callback_result = req.body;

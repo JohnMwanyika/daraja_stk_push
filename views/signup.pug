@@ -10,30 +10,49 @@ noscript.
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&amp;display=swap">
 
-link(rel="icon" href="assets/favicon/favicon.ico" sizes="any")
+link(rel="icon" href="assets/icon/mpesa.png" sizes="any")
 title Lipa | #{title}
+//- sweet alert
+script(src="https://cdn.jsdelivr.net/npm/sweetalert2@10")
+//- jquery
+script(src="assets/js/jquery.min.js")
+
 body(class="d-flex align-items-center bg-light-green")
     main.container
         .row.align-items-center.justify-content-center.vh-100
             .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
                 h1.mb-2.text-center #{title}
                 p.text-secondary.text-center Fill in the form to create your account.
-                    form(action='#', method='post')
+                    form(action='/signup' method='post')
                         .row
                             .col-12
                                 .mb-4
                                     label.form-label.
 
-                                        Full name
+                                        First name
 
-                                    input.form-control(type="text" placeholder="Your full name")
+                                    input.form-control(type="text" placeholder="Your first name" name="first_name")
+                            .col-12
+                                .mb-4
+                                    label.form-label.
+
+                                        Last name
+
+                                    input.form-control(type="text" placeholder="Your last name" name="last_name")
                             .col-12
                                 .mb-4
                                     label.form-label.
 
                                         Email Address
 
-                                    input.form-control(type="email" placeholder="Your email address")
+                                    input.form-control(type="email" placeholder="Your email address" name="email")
+                            .col-12
+                                .mb-4
+                                    label.form-label.
+
+                                        Phone
+
+                                    input.form-control(type="number" placeholder="Your phone" name="phone")
                         .row
                             .col-12
                                 .mb-4
@@ -51,7 +70,7 @@ body(class="d-flex align-items-center bg-light-green")
                                         Confirm password
 
                                     .input-group
-                                        input.rounded.form-control(type="password" autocomplete="off", data-toggle-password-input, placeholder="Your password again")
+                                        input.rounded.form-control(type="password" autocomplete="off", data-toggle-password-input, placeholder="Your password again" name="password")
                                         button.rounded.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
                         //- .form-check
                             input.form-check-input#agree(type="checkbox")
@@ -62,10 +81,28 @@ body(class="d-flex align-items-center bg-light-green")
                                 a(href="javascript: void(0);") Privacy Policy
                         .row.align-items-center.text-center
                             .col-12
-                                button.btn.w-100.btn-warning.mt-6.mb-2(type="button") Get started
+                                button.btn.w-100.btn-warning.mt-6.mb-2(type="Signup") Get started
                             .col-12
                                 small.mb-0.text-muted
                                     | Already registered? 
                                     a.text-info.fw-semibold(href="/") Login
+        //- sweet aleart
+    if (fire)
+        script.
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
 
+            Toast.fire({
+                icon: '#{message.type}',
+                title: "#{message.info}"
+            })
     script(src="assets/js/theme.bundle.js")

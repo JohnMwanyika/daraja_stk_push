@@ -7,23 +7,26 @@ link(rel="preconnect" href="https://fonts.gstatic.com/", crossorigin)
 link(rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap")
 link(rel="stylesheet" media="print" onload="this.onload=null;this.removeAttribute(\'media\');" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap")
 noscript.
-
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&amp;display=swap">
-
-link(rel="icon" href="assets/favicon/favicon.ico" sizes="any")
+link(rel="icon" href="assets/icon/mpesa.png" sizes="any")
 title Lipa | #{title}
+//- sweet alert
+script(src="https://cdn.jsdelivr.net/npm/sweetalert2@10")
+//- jquery
+script(src="assets/js/jquery.min.js")
+
 body(class="d-flex align-items-center bg-light-green")
     main.container
         .row.align-items-center.justify-content-center.vh-100
             .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
                 h1.mb-2.text-center #{title}
                 p.text-secondary.text-center Enter your email address and password to create your session.
-                form
+                form#login(method="post")
                     .row
                         .col-12
                             .mb-4
                                 label.form-label Email Address
-                                input.form-control(type="email" placeholder="Your email address")
+                                input.form-control(type="email" placeholder="Your email address" name="email")
                         .col-12
                             .mb-4
                                 .row
@@ -32,16 +35,106 @@ body(class="d-flex align-items-center bg-light-green")
                                     .col-auto
                                         a.form-text.small.text-muted.link-primary(href="#") Forgot password
                                 .input-group
-                                    input.form-control.rounded(type="password" autocomplete="off", data-toggle-password-input, placeholder="Your password")
+                                    input.form-control.rounded(type="password" autocomplete="off", data-toggle-password-input, placeholder="Your password" name="password")
                                     button.rounded.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
                     //- .form-check
                         input.form-check-input#remember(type="checkbox")
                         label.form-check-label(for="remember") Remember me
                     .row.align-items-center.text-center
                         .col-12
-                            button.btn.w-100.btn-warning.mt-6.mb-2(type="button") Sign in
+                            button.btn.w-100.btn-warning.mt-6.mb-2#submitbtn(type="submit") Sign in
                         .col-12
                             small.mb-0.text-muted
                                 | Don't have an account yet? 
                                 a.text-success.fw-semibold(href="/signup") Sign up
+    if (message)
+        script.
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: "#{message.type}",
+                title: "#{message.info}"
+            });
+
     script(src="assets/js/theme.bundle.js")
+
+    script.
+        var Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            //- timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+
+        $("#login").submit(function(event){
+            event.preventDefault();
+            //- get form
+            var form = $("#login");
+            //- ajax call
+            if ($('input').val() == "") {
+                Toast.fire({
+                    icon: "error",
+                    title: "All fields are required"
+                });
+            }else{
+                $.ajax({
+                    url:"/api/signIn",
+                    type:form.attr('method'),
+                    data: form.serialize(),
+                    beforeSend: function(){
+                        loading.show(function(){
+                            $("#submitbtn").prop("disabled", true);
+                        });
+                        Toast.fire({
+                            title: "Authorizing.."
+                        });
+                    },
+                    complete: function(){
+                        //- Toast.fire({
+                        //-     title: "Login Sucess!!"
+                        //- });
+                    },
+                    success: function(data){
+                        var msg = data.messages.type;
+                        if(msg == "success"){
+                            //- Clears The form fields
+                            //- fires the toast
+                            Toast.fire({
+                                icon: data.messages.type,
+                                title: data.messages.info
+                            });
+                            window.location.href = '/payment'
+                        }else{
+                            Toast.fire({
+                                icon: "error",
+                                title: data.messages.info
+                            });
+                            form[0].reset();
+                        }
+                    },
+                    timeout: 5000,
+                    error: function (request, status, error) {
+                        Toast.fire({
+                            icon: "error",
+                            title: "Oops! an error occured try again"
+                        });
+                    }
+
+                });
+            }
+        });
