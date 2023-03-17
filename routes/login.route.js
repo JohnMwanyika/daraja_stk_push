@@ -7,8 +7,12 @@ const {
   signIn,
   signOut,
   signInApi,
+  signUpApi
 } = require("../controllers/login.controller");
 var router = express.Router();
+
+// const {authenticateUser} = require('./middlewares/authenticate');
+// router.use(authenticateUser);
 
 router.get("/", loginForm);
 // router.get("/signup", (req, res) => {
@@ -18,6 +22,7 @@ router.post("/signup", signUp);
 router.post("/login", signIn);
 router.get("/logout", signOut);
 router.post("/api/signin", signInApi);
+router.post("/api/signup", signUpApi);
 
 // dashboard routes
 // router.use("/dashboard", dashboardRoute);

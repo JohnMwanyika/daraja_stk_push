@@ -49,7 +49,7 @@ module.exports = {
       //   },
       //   fire: "fire",
       // });
-      res.redirect('/')
+      res.redirect('/');
     } catch (err) {
       return res.status(401).render("signup", {
         message: { info: "Oops!! sorry cant reach database", type: "error" },
@@ -71,7 +71,7 @@ module.exports = {
 
       if (!user) {
         return res.render("signin", {
-        // return res.json( {
+          // return res.json( {
           Swal: require("sweetalert2"),
           message: {
             info: "No user with the supplied username",
@@ -164,4 +164,61 @@ module.exports = {
       });
     }
   },
+
+  signUpApi: async (req, res) => {
+    try {
+      const { first_name, last_name, email } = req.body;
+      const phone = parseInt(req.body.phone);
+      var pass = req.body.password;
+
+      let userExists = await prisma.user.findUnique({
+        where: {
+          email: email,
+        },
+      })
+
+      console.log(userExists);
+
+      if (userExists) {
+        res.status(401).json({
+          message: {
+            info: "email already in use, log in to your account",
+            type: "warning",
+          },
+        });
+        return;
+      } else {
+        pass = bcrypt.hashSync(pass, 10);
+
+        let user = await prisma.user.create({
+          data: {
+            first_name: first_name,
+            last_name: last_name,
+            email: email,
+            password: pass,
+            phone: phone
+          },
+        });
+
+        res.json({
+          message: {
+            info: `User ${user.first_name} created successfully! redirecting to login...`,
+            type: "success",
+          },
+          // fire: "fire",
+        });
+      }
+
+      // console.log(user.password);
+
+
+      // res.redirect('/');
+    } catch (err) {
+      return res.status(401).json({
+        message: { info: "Oops!! sorry cant reach database", type: "error" },
+        fire: "fire",
+        // Swal: require("sweetalert2"),
+      });
+    }
+  }
 };

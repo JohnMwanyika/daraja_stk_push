@@ -23,7 +23,7 @@ body(class="d-flex align-items-center bg-light-green")
             .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
                 h1.mb-2.text-center #{title}
                 p.text-secondary.text-center Fill in the form to create your account.
-                    form(action='/signup' method='post')
+                    form(action='/api/signup' method='post')#signup
                         .row
                             .col-12
                                 .mb-4
@@ -81,19 +81,40 @@ body(class="d-flex align-items-center bg-light-green")
                                 a(href="javascript: void(0);") Privacy Policy
                         .row.align-items-center.text-center
                             .col-12
-                                button.btn.w-100.btn-warning.mt-6.mb-2(type="Signup") Get started
+                                button.btn.w-100.btn-warning.mt-6.mb-2(type="Signup")#submitbtn Get started 
+                                    span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
+
                             .col-12
                                 small.mb-0.text-muted
                                     | Already registered? 
                                     a.text-info.fw-semibold(href="/") Login
         //- sweet aleart
-    if (fire)
+        //- if (fire)
+            script.
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+
+                Toast.fire({
+                    icon: '#{message.type}',
+                    title: "#{message.info}"
+                })
+        script(src="assets/js/theme.bundle.js")
+
         script.
-            const Toast = Swal.mixin({
+            var Toast = Swal.mixin({
                 toast: true,
                 position: 'top',
                 showConfirmButton: false,
-                timer: 3000,
+                //- timer: 3000,
                 timerProgressBar: true,
                 didOpen: (toast) => {
                     toast.addEventListener('mouseenter', Swal.stopTimer)
@@ -101,8 +122,56 @@ body(class="d-flex align-items-center bg-light-green")
                 }
             })
 
-            Toast.fire({
-                icon: '#{message.type}',
-                title: "#{message.info}"
-            })
-    script(src="assets/js/theme.bundle.js")
+            let loader = $('#spina').hide();
+            $("#signup").submit(function(event){
+                event.preventDefault();
+                //- get form
+                var form = $(this);
+                //- ajax call
+
+                if ($('#email').val() == "" || $('#pass').val() == "") {
+                    Toast.fire({
+                        icon: "error",
+                        title: "All fields are required",
+                        timer:3000
+                    });
+                }else{
+                    $.ajax({
+                        url:form.attr('action'),
+                        type:form.attr('method'),
+                        data: form.serialize(),
+                        beforeSend: function(){
+                            loader.show(function(){
+                                $("#submitbtn").prop("disabled", true);
+                            });
+                            Toast.fire({
+                                title: "Authorizing.."
+                            });
+                        },
+                        complete: function(){
+                            loader.hide(function(){
+                                $("#submitbtn").removeAttr('disabled');
+                            });
+                        },
+                        success: function(data){
+                            Toast.fire({
+                                icon: data.message.type,
+                                title: data.message.info,
+                                timer:3000
+                            });
+                            //- form[0].reset();
+                            window.location.href = '/'
+                        },
+                        timeout: 6000,
+                        error: function (request, status, error) {
+                            //- console.log(request.responseJSON.message.info)
+                            Toast.fire({
+                                icon: request.responseJSON.message.type,
+                                title: request.responseJSON.message.info,
+                                timer:3000
+                            });
+                        }
+
+                    });
+                }
+            });

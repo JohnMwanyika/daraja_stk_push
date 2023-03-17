@@ -21,7 +21,7 @@ body(class="d-flex align-items-center bg-light-green")
             .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
                 h1.mb-2.text-center #{title}
                 p.text-secondary.text-center Enter your email address and password to create your session.
-                form#login(method="post",action="/api/signin")
+                form#login(method="post" action="/api/signin")
                     .row
                         .col-12
                             .mb-4
@@ -49,24 +49,6 @@ body(class="d-flex align-items-center bg-light-green")
                             small.mb-0.text-muted
                                 | Don't have an account yet? 
                                 a.text-success.fw-semibold(href="/signup") Sign up
-    //- if (message)
-        script.
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            })
-
-            Toast.fire({
-                icon: "#{message.type}",
-                title: "#{message.info}"
-            });
 
     //- script(src="assets/js/theme.bundle.js")
 
@@ -115,24 +97,20 @@ body(class="d-flex align-items-center bg-light-green")
                         });
                     },
                     success: function(data){
-                        let msg = data.message.type;
-                        //- alert(msg)
-                        if(msg == "success"){
-                            //- fires the toast
+                        if (data.message.type == 'success'){
                             Toast.fire({
                                 icon: data.message.type,
                                 title: data.message.info,
                                 timer:3000
                             });
-                            form[0].reset();
-                            window.location.href = '/payment'
-                        }else{
-                            Toast.fire({
-                                icon: "error",
-                                title: data.message.info,
-                                timer:3000
-                            });
+                        form[0].reset();
+                        window.location.href = '/payment'
                         }
+                        Toast.fire({
+                            icon: data.message.type,
+                            title: data.message.info,
+                            timer:3000
+                        });
                     },
                     timeout: 6000,
                     error: function (request, status, error) {
@@ -145,3 +123,21 @@ body(class="d-flex align-items-center bg-light-green")
                 });
             }
         });
+    if (message)
+        script.
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: "#{message.type}",
+                title: "#{message.info}"
+            });

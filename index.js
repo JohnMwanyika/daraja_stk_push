@@ -14,6 +14,11 @@ const { PrismaClient } = require("@prisma/client"); //this is where db transacti
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }))
 app.use(cors());
+
+// user auth
+const {authenticateUser} = require('./middlewares/authenticate');
+// app.use(authenticateUser);
+
 // serving static files
 app.use(express.static(path.join(__dirname, "public")));
 app.use("assets", express.static("/public/assets/"));
@@ -21,6 +26,7 @@ app.use("assets", express.static("/public/assets/"));
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
 // initialize and configure session store middleware
+
 app.use(
     session({
         secret: "thisismysecretnooneknowsmysecrethahah",
@@ -34,6 +40,7 @@ app.use(
         resave: false,
     })
 );
+
 const prisma = new PrismaClient();
 
 
@@ -48,9 +55,9 @@ app.get('/signup', (req, res) => {
     res.render('signup', { title: 'Sign up to Lipa' })
 })
 
-app.get('/payment', (req, res) => {
+app.get('/payment', authenticateUser, (req, res) => {
     console.log(`${req.session.user.first_name} visited the payment page`)
-    res.render('payment', { title: "Lipa" })
+    res.render('payment', { title: "Lipa",phone:req.session.user.phone })
 })
 
 // middleware function to generate token 
@@ -81,7 +88,7 @@ const generateToken = async (req, res, next) => {
 app.use(generateToken);
 
 // Sending the stk push tothe provided credentials on the rquest body
-app.post("/stk", generateToken, async (req, res) => {
+app.post("/stk",authenticateUser, generateToken, async (req, res) => {
     const phone = req.body.phone.substring(1)
     const amount = req.body.amount
 
@@ -141,7 +148,7 @@ app.post("/stk", generateToken, async (req, res) => {
 // const prisma = new PrismaClient();
 // import sms utility
 const sendSms = require('./utils/sendSms');
-const { signIn } = require('./controllers/login.controller');
+// const { signIn } = require('./controllers/login.controller');
 
 app.post('/callback', async (req, res) => {
     const callback_result = req.body;
