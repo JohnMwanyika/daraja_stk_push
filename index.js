@@ -57,7 +57,7 @@ app.get('/signup', (req, res) => {
 
 app.get('/payment', authenticateUser, (req, res) => {
     console.log(`${req.session.user.first_name} visited the payment page`)
-    res.render('payment', { title: "Lipa",phone:req.session.user.phone })
+    res.render('payment', { title: "Lipa",user:req.session.user })
 })
 
 // middleware function to generate token 

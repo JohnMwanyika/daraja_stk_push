@@ -23,7 +23,9 @@ link(rel="icon" href="assets/icon/favicon.png" sizes="any")
 //  Page Title 
 title #{title}
 body(class="d-flex align-items-center bg-light-green")
+
     main.container
+
         .row.align-items-center.justify-content-center.vh-100
             .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
                 //  Title 
@@ -46,7 +48,7 @@ body(class="d-flex align-items-center bg-light-green")
                                     Phone Number
 
                                 //  Input 
-                                input.form-control(type="number" placeholder="E.g 07xxxx..",name='phone',required, value=`0${phone}`)#phone
+                                input.form-control(type="number" placeholder="E.g 07xxxx..",name='phone',required, value=`0${user.phone}`)#phone
                         .col-12
                             //  Password 
                             .mb-4
@@ -69,7 +71,10 @@ body(class="d-flex align-items-center bg-light-green")
                             //-   Button 
                             button.btn.w-100.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push 
                                 span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
-                        .col-12
+                        .col-12.mb-4
+                            small.mb-4.text-muted
+                                | #{user.first_name} | 
+                                a.text-success.fw-semibold(href="/logout") Sign Out
 
         if (message)
             script.
