@@ -29,7 +29,10 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cors());
 
 app.get('/', (req, res) => {
-    res.render('home', { title: 'Home' })
+    res.render('signin', { title: 'Sign in' })
+})
+app.get('/signup', (req, res) => {
+    res.render('signup', { title: 'Sign up' })
 })
 
 app.get('/payment', (req, res) => {

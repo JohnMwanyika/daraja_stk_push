@@ -16,339 +16,170 @@ script(src="https://cdn.jsdelivr.net/npm/sweetalert2@10")
 //- jquery
 script(src="assets/js/jquery.min.js")
 
-script.
-
-    // Theme switcher
-
-        let themeSwitcher = document.getElementById('themeSwitcher');
-
-        const getPreferredTheme = () => {
-            if (localStorage.getItem('theme') != null) {
-                return localStorage.getItem('theme');
-            }
-
-            return document.documentElement.dataset.theme;
-        };
-
-        const setTheme = function (theme) {
-            if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.dataset.theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            } else {
-                document.documentElement.dataset.theme = theme;
-            }
-
-            localStorage.setItem('theme', theme);
-        };
-
-        const showActiveTheme = theme => {
-            const activeBtn = document.querySelector(`[data-theme-value="${theme}"]`);
-
-            document.querySelectorAll('[data-theme-value]').forEach(element => {
-                element.classList.remove('active');
-            });
-
-            activeBtn && activeBtn.classList.add('active');
-
-// Set button if demo mode is enabled
-    document.querySelectorAll('[data-theme-control="theme"]').forEach(element => {
-        if (element.value == theme) {
-            element.checked = true;
-        }
-    });
-        };
-
-        function reloadPage() {
-            window.location = window.location.pathname;
-        }
-
-
-        setTheme(getPreferredTheme());
-
-        if(typeof themeSwitcher != 'undefined') {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                if(localStorage.getItem('theme') != null) {
-                    if (localStorage.getItem('theme') == 'auto') {
-                        reloadPage();
-                    }
-                }
-            });
-
-            window.addEventListener('load', () => {
-                showActiveTheme(getPreferredTheme());
-
-                document.querySelectorAll('[data-theme-value]').forEach(element => {
-                    element.addEventListener('click', () => {
-                        const theme = element.getAttribute('data-theme-value');
-
-                        localStorage.setItem('theme', theme);
-                        reloadPage();
-                    })
-                })
-            });
-        }
-
-//  Favicon 
+//- //  Favicon 
 //- link(rel="icon" href="assets/favicon/favicon.ico" sizes="any")
 link(rel="icon" href="assets/icon/favicon.png" sizes="any")
-//  Demo script 
-script.
-
-    var themeConfig = {
-        theme: JSON.parse('"light"'),
-        isRTL: JSON.parse('false'),
-        isFluid: JSON.parse('true'),
-        sidebarBehaviour: JSON.parse('"fixed"'),
-        navigationColor: JSON.parse('"inverted"')
-            };
-
-            var isRTL = localStorage.getItem('isRTL') === 'true',
-                isFluid = localStorage.getItem('isFluid') === 'true',
-                theme = localStorage.getItem('theme'),
-                sidebarSizing = localStorage.getItem('sidebarSizing'),
-                linkLTR = document.getElementById('stylesheetLTR'),
-                linkRTL = document.getElementById('stylesheetRTL'),
-                html = document.documentElement;
-
-            if (isRTL) {
-                linkLTR.setAttribute('disabled', '');
-                linkRTL.removeAttribute('disabled');
-                html.setAttribute('dir', 'rtl');
-            } else {
-                linkRTL.setAttribute('disabled', '');
-                linkLTR.removeAttribute('disabled');
-                html.removeAttribute('dir');
-            }
 
 //  Page Title 
 title #{title}
-//  THEME CONFIGURATION 
-script.
+body(class="d-flex align-items-center bg-light-green")
+    main.container
+        .row.align-items-center.justify-content-center.vh-100
+            .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
+                //  Title 
+                h1.mb-2.text-center
+                    span
+                        img(src="assets/icon/mpesa.png",height="74px" alt="...")
 
-    let themeAttrs = document.documentElement.dataset;
+                //  Subtitle 
+                p.text-secondary.text-center.
 
-        for(let attr in themeAttrs) {
-            if(localStorage.getItem(attr) != null) {
-                document.documentElement.dataset[attr] = localStorage.getItem(attr);
+                    Enter your phone number and amount to be paid
+                //  Form 
+                form(action="/stk",method="post")#myForm
+                    .row
+                        .col-12
+                            .mb-4
+                                //  Label 
+                                label.form-label.
 
-                if (theme === 'auto') {
-                    document.documentElement.dataset.theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                                    Phone Number
 
-                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                        e.matches ? document.documentElement.dataset.theme = 'dark' : document.documentElement.dataset.theme = 'light';
-                    });
-                }
-            }
-        }
+                                //  Input 
+                                input.form-control(type="number" placeholder="E.g 07xxxx..",name='phone',required)#phone
+                        .col-12
+                            //  Password 
+                            .mb-4
+                                .row
+                                    .col
+                                        //  Label 
+                                        label.form-label.
 
-//  MAIN CONTENT 
-main.container
-    .row.align-items-center.justify-content-center.vh-100
-        .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
-            //  Title 
-            h1.mb-2.text-center
-                span
-                    img(src="assets/icon/mpesa.png",height="74px" alt="...")
+                                            Amount
 
-            //  Subtitle 
-            p.text-secondary.text-center.
+                                    .col-auto
+                                        //  Help text 
+                                        //- a.form-text.small.text-muted.link-primary(href="reset-password-illustration.html") Forgot password
+                                .input-group
+                                    input.form-control(type="number" autocomplete="off", data-toggle-password-input, placeholder="E.g 10",name="amount",required).amount
+                                    //- button.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
 
-                Enter your phone number and amount to be paid
-            //  Form 
-            form(action="/stk",method="post")#myForm
-                .row
-                    .col-12
-                        .mb-4
-                            //  Label 
-                            label.form-label.
+                    .row.align-items-center.text-center
+                        .col-12
+                            //-   Button 
+                            button.btn.w-100.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push 
+                                span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
+                        .col-12
 
-                                Phone Number
-
-                            //  Input 
-                            input.form-control(type="number" placeholder="E.g 07xxxx..",name='phone',required)#phone
-                    .col-12
-                        //  Password 
-                        .mb-4
-                            .row
-                                .col
-                                    //  Label 
-                                    label.form-label.
-
-                                        Amount
-
-                                .col-auto
-                                    //  Help text 
-                                    //- a.form-text.small.text-muted.link-primary(href="reset-password-illustration.html") Forgot password
-                            //  / .row 
-                            //  Input 
-                            .input-group.input-group-merge
-                                input.form-control(type="number" autocomplete="off", data-toggle-password-input, placeholder="E.g 10",name="amount",required).amount
-                                //- button.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
-
-                .row.align-items-center.text-center
-                    .col-12
-                        //-   Button 
-                        button.btn.w-100.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push 
-                            span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
-                    .col-12
-
-    if (message)
-        script.
-            console.log(message)
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            })
-            Toast.fire({
-                icon: message.type,
-                title:message.info.message
-            });
-//- main js
-script(src="assets/js/theme.bundle.js")
-
-script.
-    var loading = $('#spina').hide();
-    //- var submitbtn = $('#submit');
-    //-  $(':input[type="submit"]').prop('disabled', true);
-    //-  $('input[type="text"], input[type="date"], .txtArea').keyup(function() {
-    //- if($('input[type="text"]').val() && $('input[type="date"]').val() && $('.txtArea').val() != '') {
-    //-     $(':input[type="submit"]').prop('disabled', false);
-    //- }
-    //- });
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'top',
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
-    })
-
-
-
-    $("#submitbtn").click(function(event){
-        event.preventDefault();
-        //- get form
-        var form = $("#myForm");
-        //- make sure empty form is not submitted
-        if ($('#phone').val() == "" || $('.amount').val() == "") {
-            Toast.fire({
-                icon: "error",
-                title: "All fields are required"
-            });
-        }else if ($('#phone').val().length != 10 ){
-            Toast.fire({
-                icon: "error",
-                title: "Enter a valid phone number..."
-            });
-        }else if ($('.amount').val() < 1){
-            Toast.fire({
-                icon: "error",
-                title: "Invalid amount",
-            });
-        }else{
-            $.ajax({
-                url:"/stk",
-                type:form.attr('method'),
-                data: form.serialize(),
-                beforeSend: function(){
-                    loading.show(function(){
-                        $("#submitbtn").prop("disabled", true);
-                    });
-                },
-                complete: function(){
-                    loading.hide(function(){
-                        $("#submitbtn").removeAttr('disabled');
-                    });
-                    //- listenToCallback();
-                },
-                success: function(data){
-                    let rescode = data.response.ResponseCode;
-                    console.log(data.response.ResponseCode)
-                    //- alert(data);
-                    if(data.response.ResponseCode == '0'){
-                        //- Clears The form fields
-                        form[0].reset();
-                        Toast.fire({
-                            //- icon: data.message.type,
-                            icon: 'warning',
-                            title:'Enter your mpesa password...',
-                            timer:false
-                        });
-                    }else{
-                        Toast.fire({
-                            icon: "error",
-                            title: "Oops! an error occured try again"
-                        });
+        if (message)
+            script.
+                console.log(message)
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
                     }
-                },
-                timeout: 10000,
-                error: function (request, status, error) {
-                    //- alert(request,status);
-                    Toast.fire({
-                        icon: "error",
-                        title: "Request time out try again!"
-                    });
-                }
-
-            });
-        }
-    });
-
-
-    function listenToCallback(){
-        $.ajax({
-            url:"/callback",
-            type:'post',
-            beforeSend: function(){
+                })
                 Toast.fire({
-                    icon: 'warning',
-                    title:'Processing payment...',
-                    timer:false
+                    icon: message.type,
+                    title:message.info.message
                 });
-            },
-            complete: function(status){
-                //- Toast.fire({
-                //-     icon: 'warning',
-                //-     title: status,
-                //-     //- timer:false
-                //- });
-            },
-            success: function(data){
-                let rescode = data.response;
-                console.log(data.response)
-                alert(data.response);
-            //-     if(data.response.ResponseCode == '0'){
-            //-         //- Clears The form fields
-            //-         form[0].reset();
-            //-         Toast.fire({
-            //-             icon: 'warning',
-            //-             title:'Enter your mpesa password',
-            //-             timer:false
-            //-         });
-            //-     }else{
-            //-         Toast.fire({
-            //-             icon: "error",
-            //-             title: "Oops! an error occured try again"
-            //-         });
-            //-     }
-            },
-            timeout: 10000,
-            error: function (request, status, error) {
-                //- alert(request,status);
+    //- main js
+    script(src="assets/js/theme.bundle.js")
+
+    script.
+        var loading = $('#spina').hide();
+        //- var submitbtn = $('#submit');
+        //-  $(':input[type="submit"]').prop('disabled', true);
+        //-  $('input[type="text"], input[type="date"], .txtArea').keyup(function() {
+        //- if($('input[type="text"]').val() && $('input[type="date"]').val() && $('.txtArea').val() != '') {
+        //-     $(':input[type="submit"]').prop('disabled', false);
+        //- }
+        //- });
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+
+
+
+        $("#submitbtn").click(function(event){
+            event.preventDefault();
+            //- get form
+            var form = $("#myForm");
+            //- make sure empty form is not submitted
+            if ($('#phone').val() == "" || $('.amount').val() == "") {
                 Toast.fire({
                     icon: "error",
-                    title: "Request time out try again!"
+                    title: "All fields are required"
+                });
+            }else if ($('#phone').val().length != 10 ){
+                Toast.fire({
+                    icon: "error",
+                    title: "Enter a valid phone number..."
+                });
+            }else if ($('.amount').val() < 1){
+                Toast.fire({
+                    icon: "error",
+                    title: "Invalid amount",
+                });
+            }else{
+                $.ajax({
+                    url:"/stk",
+                    type:form.attr('method'),
+                    data: form.serialize(),
+                    beforeSend: function(){
+                        loading.show(function(){
+                            $("#submitbtn").prop("disabled", true);
+                        });
+                    },
+                    complete: function(){
+                        loading.hide(function(){
+                            $("#submitbtn").removeAttr('disabled');
+                        });
+                        //- listenToCallback();
+                    },
+                    success: function(data){
+                        let rescode = data.response.ResponseCode;
+                        console.log(data.response.ResponseCode)
+                        //- alert(data);
+                        if(data.response.ResponseCode == '0'){
+                            //- Clears The form fields
+                            form[0].reset();
+                            Toast.fire({
+                                //- icon: data.message.type,
+                                icon: 'warning',
+                                title:'Enter your mpesa password...',
+                                timer:false
+                            });
+                        }else{
+                            Toast.fire({
+                                icon: "error",
+                                title: "Oops! an error occured try again"
+                            });
+                        }
+                    },
+                    timeout: 10000,
+                    error: function (request, status, error) {
+                        //- alert(request,status);
+                        Toast.fire({
+                            icon: "error",
+                            title: "Request time out try again!"
+                        });
+                    }
+
                 });
             }
         });
-    }

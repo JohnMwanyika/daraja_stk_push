@@ -1,0 +1,47 @@
+meta(charset="utf-8")
+meta(name="viewport" content="width=device-width,initial-scale=1")
+meta(content="Webinning" name="author")
+link#stylesheetLTR(rel="stylesheet" href="assets/css/theme.bundle.css")
+link#stylesheetRTL(rel="stylesheet" href="assets/css/theme.rtl.bundle.css")
+link(rel="preconnect" href="https://fonts.gstatic.com/", crossorigin)
+link(rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap")
+link(rel="stylesheet" media="print" onload="this.onload=null;this.removeAttribute(\'media\');" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap")
+noscript.
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&amp;display=swap">
+
+link(rel="icon" href="assets/favicon/favicon.ico" sizes="any")
+title Lipa | #{title}
+body(class="d-flex align-items-center bg-light-green")
+    main.container
+        .row.align-items-center.justify-content-center.vh-100
+            .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
+                h1.mb-2.text-center #{title}
+                p.text-secondary.text-center Enter your email address and password to create your session.
+                form
+                    .row
+                        .col-12
+                            .mb-4
+                                label.form-label Email Address
+                                input.form-control(type="email" placeholder="Your email address")
+                        .col-12
+                            .mb-4
+                                .row
+                                    .col
+                                        label.form-label Password
+                                    .col-auto
+                                        a.form-text.small.text-muted.link-primary(href="#") Forgot password
+                                .input-group
+                                    input.form-control.rounded(type="password" autocomplete="off", data-toggle-password-input, placeholder="Your password")
+                                    button.rounded.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
+                    //- .form-check
+                        input.form-check-input#remember(type="checkbox")
+                        label.form-check-label(for="remember") Remember me
+                    .row.align-items-center.text-center
+                        .col-12
+                            button.btn.w-100.btn-warning.mt-6.mb-2(type="button") Sign in
+                        .col-12
+                            small.mb-0.text-muted
+                                | Don't have an account yet? 
+                                a.text-success.fw-semibold(href="sign-up-basic.html") Sign up
+    script(src="assets/js/theme.bundle.js")
