@@ -178,7 +178,10 @@ app.post('/callback', async (req, res) => {
             let recipient = parseInt(response.number);
             let amount = parseInt(response.amount)
             // send text to user
-            sendSms(phone, `Hello ${recipient} your payment of ${amount} has been received for account number ${recipient}`)
+            if (!req.session.user){
+                sendSms(phone, `Hello ${recipient} your payment of ${amount} has been received for account number ${recipient}`) 
+            }
+            sendSms(phone, `Hello ${req.session.user.first_name} your payment of ${amount} has been received for account number ${recipient}`)
             // res.json({ 'response': response });
         })
         .catch((err) => {
