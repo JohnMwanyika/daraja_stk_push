@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "generate": "prisma generate"
+    "generate": "prisma generate",
+    "push":"prisma db push"
   },
   "keywords": [
     "mpesa",
