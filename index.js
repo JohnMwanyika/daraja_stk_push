@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cors());
 
 // user auth
-const {authenticateUser} = require('./middlewares/authenticate');
+const { authenticateUser } = require('./middlewares/authenticate');
 // app.use(authenticateUser);
 
 // serving static files
@@ -49,7 +49,7 @@ app.listen(port, () => {
 });
 
 const signinRoute = require('./routes/login.route');
-app.use('/',signinRoute)
+app.use('/', signinRoute)
 
 app.get('/signup', (req, res) => {
     res.render('signup', { title: 'Sign up to Lipa' })
@@ -57,7 +57,7 @@ app.get('/signup', (req, res) => {
 
 app.get('/payment', authenticateUser, (req, res) => {
     console.log(`${req.session.user.first_name} visited the payment page`)
-    res.render('payment', { title: "Lipa",user:req.session.user })
+    res.render('payment', { title: "Lipa", user: req.session.user })
 })
 
 // middleware function to generate token 
@@ -88,7 +88,7 @@ const generateToken = async (req, res, next) => {
 app.use(generateToken);
 
 // Sending the stk push tothe provided credentials on the rquest body
-app.post("/stk",authenticateUser, generateToken, async (req, res) => {
+app.post("/stk", authenticateUser, generateToken, async (req, res) => {
     const phone = req.body.phone.substring(1)
     const amount = req.body.amount
 
@@ -151,42 +151,57 @@ const sendSms = require('./utils/sendSms');
 // const { signIn } = require('./controllers/login.controller');
 
 app.post('/callback', async (req, res) => {
+
+    console.log('Response received successfully');
     const callback_result = req.body;
-    console.log(callback_result);
     //weather or not the transaction is successful Safaricom will post to the callback route
     // - if transaction is successful the callback will contain the CallbackMetadata and vice-versa
     // so, if it doesnt contain the callbackMetadata we respond to safaricom by telling them we are ok so that it doesnt keep reposting
+
     if (!callback_result.Body.stkCallback.CallbackMetadata) {
         return res.json("ok");
     }
     // - else we receive the callbackMetadata and store the information to our db
     console.log(callback_result.Body.stkCallback.CallbackMetadata);
 
+    // const phone = req.body.phone
+    // const transcId = req.body.transcId
+    // const ammount = req.body.ammount
     const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value
     const transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1].Value
     const ammount = callback_result.Body.stkCallback.CallbackMetadata.Item[0].Value
 
-    const payment = await prisma.payment.create({
-        data: {
-            transc_id: transcId,
-            amount: ammount,
-            number: phone
-        }
-    })
-        .then((response) => {
-            console.log(response);
-            let recipient = parseInt(response.number);
-            let amount = parseInt(response.amount)
-            // send text to user
-            // if (!req.session.user){
-            //     sendSms(phone, `Hello ${recipient} your payment of ${amount} has been received for account number ${recipient}`)
-            // }
-            sendSms(phone, `Hello ${req.session.user.first_name} your payment of ${amount} has been received for account number ${recipient}`)
-            // res.json({ 'response': response });
+    try {
+        const userpaid = await prisma.user.findUnique({
+            where: {
+                phone: phone
+            }
         })
-        .catch((err) => {
-            console.log(err.message);
+
+        console.log('User paid is ' + userpaid)
+
+        const payment = await prisma.payment.create({
+            data: {
+                transc_id: transcId,
+                amount: ammount,
+                number: phone
+            }
         })
+            .then((response) => {
+                console.log(response);
+                let recipient = parseInt(response.number);
+                let amount = parseInt(response.amount)
+                // send text to user
+                if (!userpaid) {
+                    sendSms(phone, `Hello ${recipient} your payment of Kshs ${amount} has been received for account number ${recipient}`)
+                }
+                sendSms(phone, `Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`)
+                // res.json({ 'response': response });
+            })
+    } catch (error) {
+        console.log(error.message)
+    }
+
 });
 
 // // Getting feedback
