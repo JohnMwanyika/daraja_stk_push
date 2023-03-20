@@ -38,7 +38,7 @@ body(class="d-flex align-items-center bg-light-green")
 
                     Enter your phone number and amount to be paid
                 //  Form 
-                form(action="/stk",method="post")#myForm
+                form(action="/transaction/stk",method="post")#myForm
                     .row
                         .col-12
                             .mb-4
@@ -142,7 +142,7 @@ body(class="d-flex align-items-center bg-light-green")
                 });
             }else{
                 $.ajax({
-                    url:"/stk",
+                    url:form.attr('action'),
                     type:form.attr('method'),
                     data: form.serialize(),
                     beforeSend: function(){
@@ -165,7 +165,7 @@ body(class="d-flex align-items-center bg-light-green")
                             form[0].reset();
                             Toast.fire({
                                 //- icon: data.message.type,
-                                icon: 'warning',
+                                icon: 'success',
                                 title:'Enter your mpesa password...',
                                 timer:false
                             });

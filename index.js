@@ -41,7 +41,7 @@ app.use(
     })
 );
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 
 app.listen(port, () => {
@@ -60,149 +60,148 @@ app.get('/payment', authenticateUser, (req, res) => {
     res.render('payment', { title: "Lipa", user: req.session.user })
 })
 
+// import all external routes
+const transactionRoutes = require('./routes/transaction.route');
+app.use('/transaction', transactionRoutes);
+
 // middleware function to generate token 
-const generateToken = async (req, res, next) => {
+// const generateToken = async (req, res, next) => {
 
-    let secret = process.env.MPESA_CONSUMER_SECRET;
-    let consumer = process.env.MPESA_CONSUMER_KEY;
+//     let secret = process.env.MPESA_CONSUMER_SECRET;
+//     let consumer = process.env.MPESA_CONSUMER_KEY;
 
-    let auth = Buffer.from(`${consumer}:${secret}`).toString('base64');
-    // console.log(auth)
+//     let auth = Buffer.from(`${consumer}:${secret}`).toString('base64');
+//     // console.log(auth)
 
-    await axios.get("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
-        headers: {
-            Authorization: `Basic ${auth}`
-        }
-    }).then((response) => {
-        console.log(response.data.access_token);
-        token = response.data.access_token
-        next();
-    }).catch((err) => {
-        console.log(err);
-        // res.json(err.message);
-    })
+//     await axios.get("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
+//         headers: {
+//             Authorization: `Basic ${auth}`
+//         }
+//     }).then((response) => {
+//         console.log(response.data.access_token);
+//         token = response.data.access_token
+//         next();
+//     }).catch((err) => {
+//         console.log(err);
+//         // res.json(err.message);
+//     })
 
-}
+// }
 
 // middleware to geenerate access token on every request
-app.use(generateToken);
+// app.use(generateToken);
 
 // Sending the stk push tothe provided credentials on the rquest body
-app.post("/stk", authenticateUser, generateToken, async (req, res) => {
-    const phone = req.body.phone.substring(1)
-    const amount = req.body.amount
+// app.post("/stk", authenticateUser, generateToken, async (req, res) => {
+//     const phone = req.body.phone.substring(1)
+//     const amount = req.body.amount
 
-    // geerating timestamp using vanilla js
-    const date = new Date();
-    const timestap =
-        date.getFullYear() +
-        ("0" + (date.getMonth() + 1)).slice(-2) +
-        ("0" + date.getDate()).slice(-2) +
-        ("0" + date.getHours()).slice(-2) +
-        ("0" + date.getMinutes()).slice(-2) +
-        ("0" + date.getSeconds()).slice(-2);
+//     // geerating timestamp using vanilla js
+//     const date = new Date();
+//     const timestap =
+//         date.getFullYear() +
+//         ("0" + (date.getMonth() + 1)).slice(-2) +
+//         ("0" + date.getDate()).slice(-2) +
+//         ("0" + date.getHours()).slice(-2) +
+//         ("0" + date.getMinutes()).slice(-2) +
+//         ("0" + date.getSeconds()).slice(-2);
 
-    const shortcode = process.env.MPESA_SHORT_CODE;
-    const passkey = process.env.MPESA_PASSKEY;
+//     const shortcode = process.env.MPESA_SHORT_CODE;
+//     const passkey = process.env.MPESA_PASSKEY;
 
-    // creating the password by concatenating the three and converting it to base 8
-    const password = Buffer.from(shortcode + passkey + timestap).toString('base64')
+//     // creating the password by concatenating the three and converting it to base 64
+//     const password = Buffer.from(shortcode + passkey + timestap).toString('base64')
 
-    // sending a post request to fafaricom with our credentials 
-    await axios.post(
-        "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
-        {
-            BusinessShortCode: shortcode,
-            Password: password,
-            Timestamp: timestap,
-            TransactionType: "CustomerPayBillOnline", // you can also use "CustomerBuyGoodsOnline"
-            Amount: amount,
-            PartyA: `254${phone}`, // initiator phone number
-            PartyB: shortcode, //paybill number
-            PhoneNumber: `254${phone}`, // initiator phone number
-            CallBackURL: process.env.CALL_BACK_URL,
-            AccountReference: `254${phone}`, // Account number used when paying
-            TransactionDesc: "Test" //description which is optional
-        },
-        {
-            headers: {
-                Authorization: `Bearer ${token}` // token generated everytime you send a request to safaricom,, this is comming from the middleware I created above
-            }
-        }
-    ).then((response) => {
-        console.log(response.data)
-        res.json({ 'response': response.data })
-        // res.redirect('/payment')
-    })
-        .catch((err) => {
-            console.log(err.message)
-            res.json({ message: { type: 'error', info: err } })
-            // res.render('payment', { message: { type: 'error', info: err } })
-        })
+//     // sending a post request to fafaricom with our credentials 
+//     await axios.post(
+//         "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+//         {
+//             BusinessShortCode: shortcode,
+//             Password: password,
+//             Timestamp: timestap,
+//             TransactionType: "CustomerPayBillOnline", // you can also use "CustomerBuyGoodsOnline"
+//             Amount: amount,
+//             PartyA: `254${phone}`, // initiator phone number
+//             PartyB: shortcode, //paybill number
+//             PhoneNumber: `254${phone}`, // initiator phone number
+//             CallBackURL: process.env.CALL_BACK_URL,
+//             AccountReference: `254${phone}`, // Account number used when paying
+//             TransactionDesc: "Test" //description which is optional
+//         },
+//         {
+//             headers: {
+//                 Authorization: `Bearer ${token}` // token generated everytime you send a request to safaricom,, this is comming from the middleware I created above
+//             }
+//         }
+//     ).then((response) => {
+//         console.log(response.data)
+//         res.json({ 'response': response.data })
+//         // res.redirect('/payment')
+//     })
+//         .catch((err) => {
+//             console.log(err.message)
+//             res.json({ message: { type: 'error', info: err } })
+//             // res.render('payment', { message: { type: 'error', info: err } })
+//         })
 
 
-})
-
-// app.get('/online_callback')
-// const { PrismaClient } = require("@prisma/client"); //this is where db transaction recording  begins
-// const prisma = new PrismaClient();
-// import sms utility
-const sendSms = require('./utils/sendSms');
+// })
+// const sendSms = require('./utils/sendSms');
 // const { signIn } = require('./controllers/login.controller');
 
-app.post('/callback', async (req, res) => {
+// app.post('/callback', async (req, res) => {
 
-    console.log('Response received successfully');
-    const callback_result = req.body;
-    //weather or not the transaction is successful Safaricom will post to the callback route
-    // - if transaction is successful the callback will contain the CallbackMetadata and vice-versa
-    // so, if it doesnt contain the callbackMetadata we respond to safaricom by telling them we are ok so that it doesnt keep reposting
+//     console.log('Response received successfully');
+//     const callback_result = req.body;
+//     //weather or not the transaction is successful Safaricom will post to the callback route
+//     // - if transaction is successful the callback will contain the CallbackMetadata and vice-versa
+//     // so, if it doesnt contain the callbackMetadata we respond to safaricom by telling them we are ok so that it doesnt keep reposting
 
-    if (!callback_result.Body.stkCallback.CallbackMetadata) {
-        return res.json("ok");
-    }
-    // - else we receive the callbackMetadata and store the information to our db
-    console.log(callback_result.Body.stkCallback.CallbackMetadata);
+//     if (!callback_result.Body.stkCallback.CallbackMetadata) {
+//         return res.json("ok");
+//     }
+//     // - else we receive the callbackMetadata and store the information to our db
+//     console.log(callback_result.Body.stkCallback.CallbackMetadata);
 
-    // const phone = req.body.phone
-    // const transcId = req.body.transcId
-    // const ammount = req.body.ammount
-    const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value
-    const transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1].Value
-    const ammount = callback_result.Body.stkCallback.CallbackMetadata.Item[0].Value
+//     // const phone = req.body.phone
+//     // const transcId = req.body.transcId
+//     // const ammount = req.body.ammount
+//     const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value
+//     const transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1].Value
+//     const ammount = callback_result.Body.stkCallback.CallbackMetadata.Item[0].Value
 
-    try {
-        const userpaid = await prisma.user.findUnique({
-            where: {
-                phone: phone
-            }
-        })
+//     try {
+//         const userpaid = await prisma.user.findUnique({
+//             where: {
+//                 phone: phone
+//             }
+//         })
 
-        console.log('User paid is ' + userpaid)
+//         console.log('User paid is ' + userpaid)
 
-        const payment = await prisma.payment.create({
-            data: {
-                transc_id: transcId,
-                amount: ammount,
-                number: phone
-            }
-        })
-            .then((response) => {
-                console.log(response);
-                let recipient = parseInt(response.number);
-                let amount = parseInt(response.amount)
-                // send text to user
-                if (!userpaid) {
-                    sendSms(phone, `Hello ${recipient} your payment of Kshs ${amount} has been received for account number ${recipient}`)
-                }
-                sendSms(phone, `Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`)
-                // res.json({ 'response': response });
-            })
-    } catch (error) {
-        console.log(error.message)
-    }
+//         const payment = await prisma.payment.create({
+//             data: {
+//                 transc_id: transcId,
+//                 amount: ammount,
+//                 number: phone
+//             }
+//         })
+//             .then((response) => {
+//                 console.log(response);
+//                 let recipient = parseInt(response.number);
+//                 let amount = parseInt(response.amount)
+//                 // send text to user
+//                 if (!userpaid) {
+//                     sendSms(phone, `Hello ${recipient} your payment of Kshs ${amount} has been received for account number ${recipient}`)
+//                 }
+//                 sendSms(phone, `Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`)
+//                 // res.json({ 'response': response });
+//             })
+//     } catch (error) {
+//         console.log(error.message)
+//     }
 
-});
+// });
 
 // // Getting feedback
 // app.get('/callback')
