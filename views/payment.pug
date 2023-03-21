@@ -11,6 +11,7 @@ link(rel="stylesheet" media="print" onload="this.onload=null;this.removeAttribut
 noscript.
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&amp;display=swap">
 
+
 //- sweet alert
 script(src="https://cdn.jsdelivr.net/npm/sweetalert2@10")
 //- jquery
@@ -20,27 +21,36 @@ script(src="assets/js/jquery.min.js")
 //- link(rel="icon" href="assets/favicon/favicon.ico" sizes="any")
 link(rel="icon" href="assets/icon/favicon.png" sizes="any")
 
-//  Page Title 
+
 title #{title}
+
+//- jquery table
+link(rel="stylesheet", href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css")
+link(rel="stylesheet", href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css")
+//- script(src="https://code.jquery.com/jquery-3.6.4.min.js")
+script(src="http://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js")
+script(src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js")
+
 body(class="d-flex align-items-center bg-light-green")
 
     main.container
 
         .row.align-items-center.justify-content-center.vh-100
-            .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
+            //- .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
+            .col-md-7.col-lg-6.d-flex.flex-column.py-6
                 //  Title 
                 h1.mb-2.text-center
                     span
-                        img(src="assets/icon/mpesa.png",height="74px" alt="...")
+                        img(src="assets/icon/lipanampesa.png" height="" width="200px" alt="...")
 
                 //  Subtitle 
                 p.text-secondary.text-center.
 
                     Enter your phone number and amount to be paid
                 //  Form 
-                form(action="/transaction/stk",method="post")#myForm
+                form(action="/transaction/stk" method="post")#myForm
                     .row
-                        .col-12
+                        .col-6
                             .mb-4
                                 //  Label 
                                 label.form-label.
@@ -48,8 +58,8 @@ body(class="d-flex align-items-center bg-light-green")
                                     Phone Number
 
                                 //  Input 
-                                input.form-control(type="number" placeholder="E.g 07xxxx..",name='phone',required, value=`0${user.phone}`)#phone
-                        .col-12
+                                input.form-control(type="number" placeholder="E.g 07xxxx.." name='phone',required, value=`0${user.phone}`)#phone
+                        .col-6
                             //  Password 
                             .mb-4
                                 .row
@@ -63,128 +73,200 @@ body(class="d-flex align-items-center bg-light-green")
                                         //  Help text 
                                         //- a.form-text.small.text-muted.link-primary(href="reset-password-illustration.html") Forgot password
                                 .input-group
-                                    input.form-control(type="number" autocomplete="off", data-toggle-password-input, placeholder="E.g 10",name="amount",required).amount
+                                    input.form-control(type="number" autocomplete="off", data-toggle-password-input, placeholder="E.g 10" name="amount",required).amount
                                     //- button.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
 
-                    .row.align-items-center.text-center
-                        .col-12
-                            //-   Button 
-                            button.btn.w-100.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push 
-                                span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
-                        .col-12.mb-4
-                            small.mb-4.text-muted
-                                | #{user.first_name} | 
-                                a.text-success.fw-semibold(href="/logout") Sign Out
+                    .align-items-center.text-center.d-flex.justify-content-between
+                        //- .col-12
+                        //-   Button 
+                        button.btn.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push 
+                            span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
+                        //- .col-12.mb-4
+                        small.mb-4.text-muted
+                            | #{user.first_name} | 
+                            a.text-success.fw-semibold(href="/logout") Sign Out
 
-        if (message)
-            script.
-                console.log(message)
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'top',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
-                })
-                Toast.fire({
-                    icon: message.type,
-                    title:message.info.message
-                });
-    //- main js
-    script(src="assets/js/theme.bundle.js")
+            .col-md-5.col-lg-6.px-lg-4.px-xl-6.d-none.d-lg-block
+                //  Image 
+                div
+                    .container
+                        .row
+                            .col-md-12
+                                .panel.panel-primary
+                                    .panel-heading
+                                        h3.panel-title Recent Transactions
+                                    .table-responsive
+                                        table#myTable.table.table-nowrap.mb-0
+                                            thead.thead-light
+                                                tr
+                                                    th.w-80px
+                                                        a.text-muted.list-sort(href="javascript: void(0);" data-sort="id").
 
-    script.
-        var loading = $('#spina').hide();
-        //- var submitbtn = $('#submit');
-        //-  $(':input[type="submit"]').prop('disabled', true);
-        //-  $('input[type="text"], input[type="date"], .txtArea').keyup(function() {
-        //- if($('input[type="text"]').val() && $('input[type="date"]').val() && $('.txtArea').val() != '') {
-        //-     $(':input[type="submit"]').prop('disabled', false);
-        //- }
-        //- });
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        })
+                                                            ID
 
+                                                    th
+                                                        a.text-muted.list-sort(href="javascript: void(0);" data-sort="name").
 
+                                                            Name
 
-        $("#submitbtn").click(function(event){
-            event.preventDefault();
-            //- get form
-            var form = $("#myForm");
-            //- make sure empty form is not submitted
-            if ($('#phone').val() == "" || $('.amount').val() == "") {
-                Toast.fire({
-                    icon: "error",
-                    title: "All fields are required"
-                });
-            }else if ($('#phone').val().length != 10 ){
-                Toast.fire({
-                    icon: "error",
-                    title: "Enter a valid phone number..."
-                });
-            }else if ($('.amount').val() < 1){
-                Toast.fire({
-                    icon: "error",
-                    title: "Invalid amount",
-                });
-            }else{
-                $.ajax({
-                    url:form.attr('action'),
-                    type:form.attr('method'),
-                    data: form.serialize(),
-                    beforeSend: function(){
-                        loading.show(function(){
-                            $("#submitbtn").prop("disabled", true);
+                                                    th.min-w-200px
+                                                        a.text-muted.list-sort(href="javascript: void(0);" data-sort="manager").
+
+                                                            Project manager
+
+                                                    th
+                                                        a.text-muted.list-sort(href="javascript: void(0);" data-sort="status").
+
+                                                            Status
+
+                                            tbody.list
+                                                tr
+                                                    td.id 1
+                                                    td.name Alibaba
+                                                    td.manager Jon Richardson
+                                                    td.status
+                                                        span.badge.text-bg-success.rounded-pill Completed
+                                                tr
+                                                    td.id 2
+                                                    td.name Nike
+                                                    td.manager Alba Monday
+                                                    td.status
+                                                        span.badge.text-bg-success.rounded-pill Completed
+                                                tr
+                                                    td.id 3
+                                                    td.name Amazon
+                                                    td.manager Rose Watson
+                                                    td.status
+                                                        span.badge.text-bg-warning.rounded-pill In-progress
+                                                tr
+                                                    td.id 4
+                                                    td.name Webinning
+                                                    td.manager Levente Kosa
+                                                    td.status
+                                                        span.badge.text-bg-warning.rounded-pill In-progress
+                                                tr
+                                                    td.id 5
+                                                    td.name eBay
+                                                    td.manager Andy Webb
+                                                    td.status
+                                                        span.badge.text-bg-danger.rounded-pill Outdated
+                                                //  <img src="https://d33wubrfki0l68.cloudfront.net/3ec9ba4912f9c709dc372e44996e05e983962a26/54f2f/assets/images/illustrations/sign-in-illustration.svg" alt="..." class="img-fluid"> 
+
+                if (message)
+                    script.
+                        console.log(message)
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        })
+                        Toast.fire({
+                            icon: message.type,
+                            title:message.info.message
                         });
-                    },
-                    complete: function(){
-                        loading.hide(function(){
-                            $("#submitbtn").removeAttr('disabled');
-                        });
-                        //- listenToCallback();
-                    },
-                    success: function(data){
-                        let rescode = data.response.ResponseCode;
-                        console.log(data.response.ResponseCode)
-                        //- alert(data);
-                        if(data.response.ResponseCode == '0'){
-                            //- Clears The form fields
-                            form[0].reset();
-                            Toast.fire({
-                                //- icon: data.message.type,
-                                icon: 'success',
-                                title:'Enter your mpesa password...',
-                                timer:false
+        //- main js
+        script(src="assets/js/theme.bundle.js")
+
+        script.
+            $('#myTable').DataTable({
+                    // paging: false,
+                    scrollY: 200
+                });
+                
+            var table = $('#myTable').DataTable();
+            var loading = $('#spina').hide();
+            //- var submitbtn = $('#submit');
+            //-  $(':input[type="submit"]').prop('disabled', true);
+            //-  $('input[type="text"], input[type="date"], .txtArea').keyup(function() {
+            //- if($('input[type="text"]').val() && $('input[type="date"]').val() && $('.txtArea').val() != '') {
+            //-     $(':input[type="submit"]').prop('disabled', false);
+            //- }
+            //- });
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+
+
+            $("#submitbtn").click(function(event){
+                event.preventDefault();
+                //- get form
+                var form = $("#myForm");
+                //- make sure empty form is not submitted
+                if ($('#phone').val() == "" || $('.amount').val() == "") {
+                    Toast.fire({
+                        icon: "error",
+                        title: "All fields are required"
+                    });
+                }else if ($('#phone').val().length != 10 ){
+                    Toast.fire({
+                        icon: "error",
+                        title: "Enter a valid phone number..."
+                    });
+                }else if ($('.amount').val() < 1){
+                    Toast.fire({
+                        icon: "error",
+                        title: "Invalid amount",
+                    });
+                }else{
+                    $.ajax({
+                        url:form.attr('action'),
+                        type:form.attr('method'),
+                        data: form.serialize(),
+                        beforeSend: function(){
+                            loading.show(function(){
+                                $("#submitbtn").prop("disabled", true);
                             });
-                        }else{
+                        },
+                        complete: function(){
+                            loading.hide(function(){
+                                $("#submitbtn").removeAttr('disabled');
+                            });
+                            //- listenToCallback();
+                        },
+                        success: function(data){
+                            let rescode = data.response.ResponseCode;
+                            console.log(data.response.ResponseCode)
+                            //- alert(data);
+                            if(data.response.ResponseCode == '0'){
+                                //- Clears The form fields
+                                form[0].reset();
+                                Toast.fire({
+                                    //- icon: data.message.type,
+                                    icon: 'success',
+                                    title:'Enter your mpesa password...',
+                                    timer:false
+                                });
+                            }else{
+                                Toast.fire({
+                                    icon: "error",
+                                    title: "Oops! an error occured try again"
+                                });
+                            }
+                        },
+                        timeout: 10000,
+                        error: function (request, status, error) {
+                            //- alert(request,status);
                             Toast.fire({
                                 icon: "error",
-                                title: "Oops! an error occured try again"
+                                title: "Request time out try again!"
                             });
                         }
-                    },
-                    timeout: 10000,
-                    error: function (request, status, error) {
-                        //- alert(request,status);
-                        Toast.fire({
-                            icon: "error",
-                            title: "Request time out try again!"
-                        });
-                    }
 
-                });
-            }
-        });
+                    });
+                }
+            });
