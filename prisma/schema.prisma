@@ -16,15 +16,15 @@ model user {
   created_at DateTime  @default(now()) @db.Timestamp(0)
   updated_at DateTime  @default(now()) @db.Timestamp(0)
   phone      Int       @unique
-  payment    payment[]
   bill       bill[]
+  payment    payment[]
 }
 
 model payment {
   id         Int      @id @default(autoincrement())
-  number     BigInt
+  number     Int
   transc_id  String   @db.VarChar(255)
-  amount     BigInt
+  amount     Decimal  @db.Decimal(15,2)
   created_at DateTime @default(now()) @db.Timestamp(0)
   updated_at DateTime @default(now()) @db.Timestamp(0)
   userId     Int?
@@ -40,8 +40,11 @@ model bill {
   bill_statusId Int
   created_at    DateTime    @default(now()) @db.Timestamp(0)
   updated_at    DateTime    @default(now()) @db.Timestamp(0)
-  user          user?       @relation(fields: [userId], references: [id])
   status        bill_status @relation(fields: [bill_statusId], references: [id])
+  user          user?       @relation(fields: [userId], references: [id])
+
+  @@index([bill_statusId], map: "bill_bill_statusId_fkey")
+  @@index([userId], map: "bill_userId_fkey")
 }
 
 model bill_status {

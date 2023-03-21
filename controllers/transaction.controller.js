@@ -2,6 +2,7 @@ require('dotenv').config();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const axios = require('axios');
+const { response } = require('express');
 const sendSms = require('../utils/sendSms');
 
 
@@ -105,5 +106,23 @@ module.exports = {
         } catch (error) {
             console.log(error.message)
         }
+    },
+    getTransactions: async (req, res) => {
+        try {
+            const userId = req.session.user.id;
+            console.log(userId);
+            user = await prisma.user.findUnique({
+                include: { payment: true },
+                where: {
+                    phone: 707438654
+                }
+            }).then((response)=>{
+                console.log(response)
+                res.json({ user_with_transaction: response })
+            })
+        } catch (error) {
+            res.json({error:error.message})
+        }
+
     }
 };
