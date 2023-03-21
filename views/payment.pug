@@ -49,9 +49,9 @@ body(class="d-flex align-items-center bg-light-green")
                     Enter your phone number and amount to be paid
                 //  Form 
                 form(action="/transaction/stk" method="post")#myForm
-                    .row
-                        .col-6
-                            .mb-4
+                    .row.mx-7
+                        .col-lg-12
+                            .mb-4.mx-7
                                 //  Label 
                                 label.form-label.
 
@@ -59,9 +59,9 @@ body(class="d-flex align-items-center bg-light-green")
 
                                 //  Input 
                                 input.form-control(type="number" placeholder="E.g 07xxxx.." name='phone',required, value=`0${user.phone}`)#phone
-                        .col-6
+                            //- .col-lg-6
                             //  Password 
-                            .mb-4
+                            .mb-4.mx-7
                                 .row
                                     .col
                                         //  Label 
@@ -76,15 +76,15 @@ body(class="d-flex align-items-center bg-light-green")
                                     input.form-control(type="number" autocomplete="off", data-toggle-password-input, placeholder="E.g 10" name="amount",required).amount
                                     //- button.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
 
-                    .align-items-center.text-center.d-flex.justify-content-between
-                        //- .col-12
-                        //-   Button 
-                        button.btn.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push 
-                            span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
-                        //- .col-12.mb-4
-                        small.mb-4.text-muted
-                            | #{user.first_name} | 
-                            a.text-success.fw-semibold(href="/logout") Sign Out
+                    .align-items-center.text-center
+                        .col-12
+                            //-   Button 
+                            button.btn.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push 
+                                span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
+                        .col-12.mb-4
+                            small.mb-4.text-muted
+                                | #{user.first_name} | 
+                                a.text-success.fw-semibold(href="/logout") Sign Out
 
             .col-md-5.col-lg-6.px-lg-4.px-xl-6.d-none.d-lg-block
                 //  Image 
