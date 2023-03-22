@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "generate": "prisma generate",
-    "push":"prisma db push"
+    "push": "prisma db push"
   },
   "keywords": [
     "mpesa",
@@ -17,6 +17,7 @@
   "author": "John Mwanyika",
   "license": "ISC",
   "dependencies": {
+    "@green-api/whatsapp-api-client": "^0.3.34",
     "@prisma/client": "^4.10.1",
     "@quixo3/prisma-session-store": "^3.1.10",
     "axios": "^1.3.4",
@@ -25,6 +26,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "moment": "^2.29.4",
     "pug": "^3.0.2",
     "sweetalert2": "^11.7.3"
   },

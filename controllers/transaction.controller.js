@@ -114,11 +114,11 @@ module.exports = {
             user = await prisma.user.findUnique({
                 include: { payment: true },
                 where: {
-                    phone: 707438654
+                    id: req.session.user.id
                 }
             }).then((response)=>{
                 console.log(response)
-                res.json({ user_with_transaction: response })
+                res.json({ transactions: response.payment })
             })
         } catch (error) {
             res.json({error:error.message})

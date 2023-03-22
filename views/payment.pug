@@ -25,11 +25,13 @@ link(rel="icon" href="assets/icon/favicon.png" sizes="any")
 title #{title}
 
 //- jquery table
-link(rel="stylesheet", href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css")
-link(rel="stylesheet", href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css")
+link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css")
+link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css")
 //- script(src="https://code.jquery.com/jquery-3.6.4.min.js")
 script(src="http://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js")
 script(src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js")
+//- require moment
+script(src="assets/js/moment.js") 
 
 body(class="d-flex align-items-center bg-light-green")
 
@@ -96,61 +98,38 @@ body(class="d-flex align-items-center bg-light-green")
                                     .panel-heading
                                         h3.panel-title Recent Transactions
                                     .table-responsive
-                                        table#myTable.table.table-nowrap.mb-0
+                                        table#transactions-table.table.table-nowrap.mb-0
                                             thead.thead-light
                                                 tr
-                                                    th.w-80px
-                                                        a.text-muted.list-sort(href="javascript: void(0);" data-sort="id").
+                                                    //- th.w-80px
+                                                    //-     a.text-muted.list-sort(href="javascript: void(0);" data-sort="id").
 
-                                                            ID
+                                                    //-         Transaction Id
 
-                                                    th
-                                                        a.text-muted.list-sort(href="javascript: void(0);" data-sort="name").
+                                                    //- th
+                                                    //-     a.text-muted.list-sort(href="javascript: void(0);" data-sort="name").
 
-                                                            Name
+                                                    //-         Phone
 
-                                                    th.min-w-200px
-                                                        a.text-muted.list-sort(href="javascript: void(0);" data-sort="manager").
+                                                    //- th.min-w-200px
+                                                    //-     a.text-muted.list-sort(href="javascript: void(0);" data-sort="manager").
 
-                                                            Project manager
+                                                    //-         Amount
 
-                                                    th
-                                                        a.text-muted.list-sort(href="javascript: void(0);" data-sort="status").
+                                                    //- th
+                                                    //-     a.text-muted.list-sort(href="javascript: void(0);" data-sort="status").
 
-                                                            Status
+                                                    //-         Date paid
 
                                             tbody.list
-                                                tr
-                                                    td.id 1
-                                                    td.name Alibaba
-                                                    td.manager Jon Richardson
-                                                    td.status
-                                                        span.badge.text-bg-success.rounded-pill Completed
-                                                tr
-                                                    td.id 2
-                                                    td.name Nike
-                                                    td.manager Alba Monday
-                                                    td.status
-                                                        span.badge.text-bg-success.rounded-pill Completed
-                                                tr
-                                                    td.id 3
-                                                    td.name Amazon
-                                                    td.manager Rose Watson
-                                                    td.status
-                                                        span.badge.text-bg-warning.rounded-pill In-progress
-                                                tr
-                                                    td.id 4
-                                                    td.name Webinning
-                                                    td.manager Levente Kosa
-                                                    td.status
-                                                        span.badge.text-bg-warning.rounded-pill In-progress
-                                                tr
-                                                    td.id 5
-                                                    td.name eBay
-                                                    td.manager Andy Webb
-                                                    td.status
-                                                        span.badge.text-bg-danger.rounded-pill Outdated
-                                                //  <img src="https://d33wubrfki0l68.cloudfront.net/3ec9ba4912f9c709dc372e44996e05e983962a26/54f2f/assets/images/illustrations/sign-in-illustration.svg" alt="..." class="img-fluid"> 
+                                                p#info Fetching transactions... 
+                                                    span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#loadingData 
+                                                //- tr
+                                                //-     td.id 4
+                                                //-     td.name Webinning
+                                                //-     td.manager Levente Kosa
+                                                //-     td.status
+                                                //-         span.badge.text-bg-warning.rounded-pill In-progress
 
                 if (message)
                     script.
@@ -171,23 +150,12 @@ body(class="d-flex align-items-center bg-light-green")
                             title:message.info.message
                         });
         //- main js
-        script(src="assets/js/theme.bundle.js")
+        //- script(src="assets/js/theme.bundle.js")
 
         script.
-            $('#myTable').DataTable({
-                    // paging: false,
-                    scrollY: 200
-                });
-                
-            var table = $('#myTable').DataTable();
+            //- var table = $('#myTable').DataTable();
             var loading = $('#spina').hide();
-            //- var submitbtn = $('#submit');
-            //-  $(':input[type="submit"]').prop('disabled', true);
-            //-  $('input[type="text"], input[type="date"], .txtArea').keyup(function() {
-            //- if($('input[type="text"]').val() && $('input[type="date"]').val() && $('.txtArea').val() != '') {
-            //-     $(':input[type="submit"]').prop('disabled', false);
-            //- }
-            //- });
+
             const Toast = Swal.mixin({
                 toast: true,
                 position: 'top',
@@ -270,3 +238,60 @@ body(class="d-flex align-items-center bg-light-green")
                     });
                 }
             });
+
+        script.
+
+            //- fetch user transactions
+            $( document ).ready(function(){
+                let spinner = $('#loadingData').hide();
+                //- $('#myTable').DataTable({
+                //-     // paging: false,
+                //-     ajax: payments
+                //-     //- scrollY: 200
+                //- });
+                $.ajax({
+                    url:'/transaction/user_transactions',
+                    type:'get',
+                    beforeSend: function(){
+                        spinner.show();
+                    },
+                    complete: function(){
+                        spinner.hide(function(){
+                            $('#info').hide();
+                        });
+                    },
+                    success: function(data){
+                        var payments = data.transactions;
+                        console.log(payments)
+                        //- alert(payments);
+                        //- var data = JSON.stringify(payments)
+                        $('#transactions-table').DataTable({
+                            data:payments,
+                            columns: [
+                                { title: 'Phone', data: 'number' },
+                                { title: 'Transaction ID', data: 'transc_id' },
+                                { title: 'Amount', data: 'amount' },
+                                { title: 'Date Paid' }
+                            ],
+                            scrollY: 200,
+                            columnDefs: [
+                                {
+                                    targets: [3],
+                                    //- title:'Date Paid',
+                                    render: function(data) {
+                                        return moment(data).format("YYYY-MM-DD HH:mm:ss");
+                                    }
+                                }
+                            ]
+                        });
+                    },
+                    timeout: 10000,
+                    error: function (request, status, error) {
+                        console.log(error);
+                        Toast.fire({
+                            icon: "error",
+                            title: "Request time out try again!"
+                        });
+                    }
+                });
+            })

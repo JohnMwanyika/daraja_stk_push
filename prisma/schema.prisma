@@ -15,16 +15,16 @@ model user {
   password   String    @db.VarChar(255)
   created_at DateTime  @default(now()) @db.Timestamp(0)
   updated_at DateTime  @default(now()) @db.Timestamp(0)
-  phone      Int       @unique
+  phone      String    @unique @db.VarChar(20)
   bill       bill[]
   payment    payment[]
 }
 
 model payment {
   id         Int      @id @default(autoincrement())
-  number     Int
+  number     String   @db.VarChar(20)
   transc_id  String   @db.VarChar(255)
-  amount     Decimal  @db.Decimal(15,2)
+  amount     Decimal  @db.Decimal(15, 2)
   created_at DateTime @default(now()) @db.Timestamp(0)
   updated_at DateTime @default(now()) @db.Timestamp(0)
   userId     Int?
