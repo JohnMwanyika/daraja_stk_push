@@ -10,7 +10,8 @@ link(rel="stylesheet" media="print" onload="this.onload=null;this.removeAttribut
 //  no-JS fallback 
 noscript.
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&amp;display=swap">
-
+//- Icofont
+<link rel="stylesheet" href="assets/css/icofont.min.css">
 
 //- sweet alert
 script(src="https://cdn.jsdelivr.net/npm/sweetalert2@10")
@@ -51,9 +52,9 @@ body(class="d-flex align-items-center bg-light-green")
                     Enter your phone number and amount to be paid
                 //  Form 
                 form(action="/transaction/stk" method="post")#myForm
-                    .row.mx-7
+                    .row.mx-sm-7.mx-lg-7
                         .col-lg-12
-                            .mb-4.mx-7
+                            .mb-4.mx-sm-7
                                 //  Label 
                                 label.form-label.
 
@@ -63,7 +64,7 @@ body(class="d-flex align-items-center bg-light-green")
                                 input.form-control(type="number" placeholder="E.g 07xxxx.." name='phone',required, value=`0${user.phone}`)#phone
                             //- .col-lg-6
                             //  Password 
-                            .mb-4.mx-7
+                            .mb-4.mx-sm-7
                                 .row
                                     .col
                                         //  Label 
@@ -88,17 +89,21 @@ body(class="d-flex align-items-center bg-light-green")
                                 | #{user.first_name} | 
                                 a.text-success.fw-semibold(href="/logout") Sign Out
 
-            .col-md-5.col-lg-6.px-lg-4.px-xl-6.d-none.d-lg-block
+            .col-md-5.col-lg-6.px-lg-4.px-xl-6.d-lg-block
                 //  Image 
                 div
                     .container
                         .row
-                            .col-md-12
+                            .col-md-12.border-primary.bg-light.p-4
+                                
                                 .panel.panel-primary
-                                    .panel-heading
+                                    .d-flex.justify-content-between.mb-3
                                         h3.panel-title.text-primary Recent Transactions
+                                        button.btn.btn-sm.btn-secondary(type="button")#refresh Refresh
+                                            //- <i class="icofont-download"></i>
+
                                     .table-responsive
-                                        table#transactions-table.table.table-nowrap.mb-0
+                                        table#transactions-table.table.table-hover.table-sm.table-borderless.border.mb-0
                                             thead.thead-light
                                                 tr
                                                     th
@@ -123,13 +128,7 @@ body(class="d-flex align-items-center bg-light-green")
 
                                             tbody.list
                                                 p#info.text-center Fetching transactions... 
-                                                    span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#loadingData 
-                                                //- tr
-                                                //-     td.id 4
-                                                //-     td.name Webinning
-                                                //-     td.manager Levente Kosa
-                                                //-     td.status
-                                                //-         span.badge.text-bg-warning.rounded-pill In-progress
+                                                    span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#loadingData
 
                 if (message)
                     script.
@@ -246,6 +245,7 @@ body(class="d-flex align-items-center bg-light-green")
                 let spinner = $('#loadingData').hide();
 
                 fetchUserTransactions();
+                //- refresh on btn click
 
                 function fetchUserTransactions(){
                     $.ajax({
@@ -303,9 +303,13 @@ body(class="d-flex align-items-center bg-light-green")
                     .fail(function(error){
                         Toast.fire({
                             icon: "error",
-                            title: `${error}`
+                            title: `${error.message}`
                         });
                     })
-                }
+                };
+
+                $('#refresh').click(function(){
+                    window.location.href = '/'
+                });
 
             })
