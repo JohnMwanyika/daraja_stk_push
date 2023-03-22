@@ -96,7 +96,7 @@ body(class="d-flex align-items-center bg-light-green")
                             .col-md-12
                                 .panel.panel-primary
                                     .panel-heading
-                                        h3.panel-title Recent Transactions
+                                        h3.panel-title.text-primary Recent Transactions
                                     .table-responsive
                                         table#transactions-table.table.table-nowrap.mb-0
                                             thead.thead-light
@@ -259,31 +259,8 @@ body(class="d-flex align-items-center bg-light-green")
                                 $('#info').hide();
                             });
                         },
-                        success: function(data){
-                            var payments = data.transactions;
-                            console.log(payments)
-                            //- alert(payments);
-                            //- var data = JSON.stringify(payments)
-                            $('#transactions-table').DataTable({
-                                data:payments,
-                                columns: [
-                                    { title: 'Phone', data: 'number' },
-                                    { title: 'Transaction ID', data: 'transc_id' },
-                                    { title: 'Amount', data: 'amount' },
-                                    { title: 'Date Paid' }
-                                ],
-                                scrollY: 200,
-                                columnDefs: [
-                                    {
-                                        targets: [3],
-                                        //- title:'Date Paid',
-                                        render: function(data) {
-                                            return moment(data).format("YYYY-MM-DD HH:mm:ss");
-                                        }
-                                    }
-                                ]
-                            });
-                        },
+                        //- success: function(data){
+                        //- },
                         timeout: 12000,
                         error: function (request, status, error) {
                             //- console.log(error);
@@ -294,7 +271,28 @@ body(class="d-flex align-items-center bg-light-green")
                         }
                     })
                     .done(function(data){
-                        //- console.log(data);
+                        var payments = data.transactions;
+                            console.log(payments)
+                            $('#transactions-table').DataTable({
+                                data:payments,
+                                columns: [
+                                    { title: 'Phone', data: 'number' },
+                                    { title: 'Transaction ID', data: 'transc_id' },
+                                    { title: 'Amount', data: 'amount' },
+                                    { title: 'Date Paid' }
+                                ],
+                                scrollY: 250,
+                                columnDefs: [
+                                    {
+                                        targets: [3],
+                                        //- title:'Date Paid',
+                                        render: function(data) {
+                                            return moment(data).format("YYYY-MM-DD HH:mm:ss");
+                                        }
+                                    }
+                                ]
+                            });
+
                         Toast.fire({
                             icon: "success",
                             title: `success`,
