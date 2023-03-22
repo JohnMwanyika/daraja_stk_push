@@ -3,8 +3,7 @@ const prisma = new PrismaClient();
 const bcrypt = require("bcrypt");
 module.exports = {
   loginForm: (req, res) => {
-    // sess = req.session;
-    // console.log(sess);
+    console.log('New visitor');
     res.render("signin", { title: 'Sign in to Lipa' });
   },
   signUp: async (req, res) => {
@@ -117,6 +116,7 @@ module.exports = {
   },
   signInApi: async (req, res) => {
     try {
+      console.log('Visitor trying to sign in...')
       const { email, password } = req.body;
       // check if user exists
       let user = await prisma.user.findUnique({
@@ -205,19 +205,12 @@ module.exports = {
             info: `User ${user.first_name} created successfully! redirecting to login...`,
             type: "success",
           },
-          // fire: "fire",
         });
       }
-
-      // console.log(user.password);
-
-
-      // res.redirect('/');
     } catch (err) {
       return res.status(401).json({
         message: { info: "Oops!! sorry cant reach database", type: "error" },
         fire: "fire",
-        // Swal: require("sweetalert2"),
       });
     }
   }

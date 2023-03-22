@@ -101,28 +101,28 @@ body(class="d-flex align-items-center bg-light-green")
                                         table#transactions-table.table.table-nowrap.mb-0
                                             thead.thead-light
                                                 tr
-                                                    //- th.w-80px
-                                                    //-     a.text-muted.list-sort(href="javascript: void(0);" data-sort="id").
+                                                    th
+                                                        a.text-muted.list-sort(href="javascript: void(0);" data-sort="id").
 
-                                                    //-         Transaction Id
+                                                            Phone
 
-                                                    //- th
-                                                    //-     a.text-muted.list-sort(href="javascript: void(0);" data-sort="name").
+                                                    th
+                                                        a.text-muted.list-sort(href="javascript: void(0);" data-sort="name").
 
-                                                    //-         Phone
+                                                            Transaction Id
 
-                                                    //- th.min-w-200px
-                                                    //-     a.text-muted.list-sort(href="javascript: void(0);" data-sort="manager").
+                                                    th
+                                                        a.text-muted.list-sort(href="javascript: void(0);" data-sort="manager").
 
-                                                    //-         Amount
+                                                            Amount
 
-                                                    //- th
-                                                    //-     a.text-muted.list-sort(href="javascript: void(0);" data-sort="status").
+                                                    th
+                                                        a.text-muted.list-sort(href="javascript: void(0);" data-sort="status").
 
-                                                    //-         Date paid
+                                                            Date paid
 
                                             tbody.list
-                                                p#info Fetching transactions... 
+                                                p#info.text-center Fetching transactions... 
                                                     span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#loadingData 
                                                 //- tr
                                                 //-     td.id 4
@@ -244,54 +244,70 @@ body(class="d-flex align-items-center bg-light-green")
             //- fetch user transactions
             $( document ).ready(function(){
                 let spinner = $('#loadingData').hide();
-                //- $('#myTable').DataTable({
-                //-     // paging: false,
-                //-     ajax: payments
-                //-     //- scrollY: 200
-                //- });
-                $.ajax({
-                    url:'/transaction/user_transactions',
-                    type:'get',
-                    beforeSend: function(){
-                        spinner.show();
-                    },
-                    complete: function(){
-                        spinner.hide(function(){
-                            $('#info').hide();
-                        });
-                    },
-                    success: function(data){
-                        var payments = data.transactions;
-                        console.log(payments)
-                        //- alert(payments);
-                        //- var data = JSON.stringify(payments)
-                        $('#transactions-table').DataTable({
-                            data:payments,
-                            columns: [
-                                { title: 'Phone', data: 'number' },
-                                { title: 'Transaction ID', data: 'transc_id' },
-                                { title: 'Amount', data: 'amount' },
-                                { title: 'Date Paid' }
-                            ],
-                            scrollY: 200,
-                            columnDefs: [
-                                {
-                                    targets: [3],
-                                    //- title:'Date Paid',
-                                    render: function(data) {
-                                        return moment(data).format("YYYY-MM-DD HH:mm:ss");
+
+                fetchUserTransactions();
+
+                function fetchUserTransactions(){
+                    $.ajax({
+                        url:'/transaction/user_transactions',
+                        type:'get',
+                        beforeSend: function(){
+                            spinner.show();
+                        },
+                        complete: function(){
+                            spinner.hide(function(){
+                                $('#info').hide();
+                            });
+                        },
+                        success: function(data){
+                            var payments = data.transactions;
+                            console.log(payments)
+                            //- alert(payments);
+                            //- var data = JSON.stringify(payments)
+                            $('#transactions-table').DataTable({
+                                data:payments,
+                                columns: [
+                                    { title: 'Phone', data: 'number' },
+                                    { title: 'Transaction ID', data: 'transc_id' },
+                                    { title: 'Amount', data: 'amount' },
+                                    { title: 'Date Paid' }
+                                ],
+                                scrollY: 200,
+                                columnDefs: [
+                                    {
+                                        targets: [3],
+                                        //- title:'Date Paid',
+                                        render: function(data) {
+                                            return moment(data).format("YYYY-MM-DD HH:mm:ss");
+                                        }
                                     }
-                                }
-                            ]
+                                ]
+                            });
+                        },
+                        timeout: 12000,
+                        error: function (request, status, error) {
+                            //- console.log(error);
+                            Toast.fire({
+                                icon: "error",
+                                title: "Request time out try again!"
+                            });
+                        }
+                    })
+                    .done(function(data){
+                        //- console.log(data);
+                        Toast.fire({
+                            icon: "success",
+                            title: `success`,
+                            position: 'top-end',
+                            heightAuto:false
                         });
-                    },
-                    timeout: 10000,
-                    error: function (request, status, error) {
-                        console.log(error);
+                    })
+                    .fail(function(error){
                         Toast.fire({
                             icon: "error",
-                            title: "Request time out try again!"
+                            title: `${error}`
                         });
-                    }
-                });
+                    })
+                }
+
             })
