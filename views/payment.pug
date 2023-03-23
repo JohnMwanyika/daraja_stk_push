@@ -269,26 +269,33 @@ body(class="d-flex align-items-center bg-light-green")
                     })
                     .done(function(data){
                         var payments = data.transactions;
-                            console.log(payments)
-                            $('#transactions-table').DataTable({
-                                data:payments,
-                                columns: [
-                                    { title: 'Phone', data: 'number' },
-                                    { title: 'Transaction ID', data: 'transc_id' },
-                                    { title: 'Amount', data: 'amount' },
-                                    { title: 'Date Paid' }
-                                ],
-                                scrollY: 250,
-                                columnDefs: [
-                                    {
-                                        targets: [3],
-                                        //- title:'Date Paid',
-                                        render: function(data) {
-                                            return moment(data).format("YYYY-MM-DD HH:mm:ss");
-                                        }
+
+                        console.log(payments)
+                        $('#transactions-table').DataTable({
+                            data:payments,
+                            columns: [
+                                { title: 'Phone', data: 'number' },
+                                { title: 'Transaction ID', data: 'transc_id' },
+                                { title: 'Amount', data: 'amount' },
+                                { title: 'Date Paid' }
+                            ],
+                            scrollY: 250,
+                            columnDefs: [
+                                {
+                                    targets: [3],
+                                    //- title:'Date Paid',
+                                    render: function(data) {
+                                        return moment(data).format("YYYY-MM-DD HH:mm:ss");
                                     }
-                                ]
-                            });
+                                },
+                                {
+                                    targets: [0],
+                                    render: function(data){
+                                        return maskMobileNumber(data)
+                                    }
+                                }
+                            ]
+                        });
 
                         Toast.fire({
                             icon: "success",
@@ -296,6 +303,13 @@ body(class="d-flex align-items-center bg-light-green")
                             position: 'top-end',
                             heightAuto:false
                         });
+                        
+                        function maskMobileNumber(mobileNumber) {
+                            const firstFour = mobileNumber.slice(0, 6);
+                            const lastTwo = mobileNumber.slice(-2);
+                            const maskedMiddle = "*".repeat(mobileNumber.length - 8);
+                            return `${firstFour}${maskedMiddle}${lastTwo}`;
+                        }
                     })
                     .fail(function(error){
                         Toast.fire({
