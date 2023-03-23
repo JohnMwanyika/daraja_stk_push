@@ -180,7 +180,7 @@ module.exports = {
       console.log(userExists);
 
       if (userExists) {
-        res.status(401).json({
+        res.json({
           message: {
             info: "email already in use, log in to your account",
             type: "warning",
@@ -208,7 +208,7 @@ module.exports = {
         });
       }
     } catch (err) {
-      return res.status(401).json({
+      return res.json({
         message: { info: "Oops!! sorry cant reach database", type: "error" },
         fire: "fire",
       });

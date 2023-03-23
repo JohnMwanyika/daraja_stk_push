@@ -172,6 +172,18 @@ body(class="d-flex align-items-center bg-light-green")
                             });
                         }
 
+                    }).done(function(response){
+                        Toast.fire({
+                            icon: data.message.type,
+                            title: data.message.info,
+                            timer:3000
+                        });
+                        window.location.href = '/'
+                    }).fail(function(error){
+                        Toast.fire({
+                            icon: "error",
+                            title: `${error.message}`
+                        });
                     });
-                }
+                };
             });

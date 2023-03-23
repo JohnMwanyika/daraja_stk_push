@@ -259,16 +259,13 @@ body(class="d-flex align-items-center bg-light-green")
                                 $('#info').hide();
                             });
                         },
-                        //- success: function(data){
-                        //- },
                         timeout: 12000,
-                        error: function (request, status, error) {
-                            //- console.log(error);
-                            Toast.fire({
-                                icon: "error",
-                                title: "Request time out try again!"
-                            });
-                        }
+                        //- error: function (request, status, error) {
+                        //-     Toast.fire({
+                        //-         icon: "error",
+                        //-         title: "Request time out try again!"
+                        //-     });
+                        //- }
                     })
                     .done(function(data){
                         var payments = data.transactions;
@@ -309,7 +306,7 @@ body(class="d-flex align-items-center bg-light-green")
                 };
 
                 $('#refresh').click(function(){
-                    window.location.href = '/'
+                    window.location.href = '/payment'
                 });
 
             })
