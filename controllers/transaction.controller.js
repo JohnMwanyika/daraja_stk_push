@@ -71,19 +71,26 @@ module.exports = {
         }
         // - else we receive the callbackMetadata and store the information to our db
         console.log(callback_result.Body.stkCallback.CallbackMetadata);
+
+        var correct_phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value;
+
+        if (correct_phone.length > 12) {
+            phone = callback_result.Body.stkCallback.CallbackMetadata.Item[3].Value;
+        } else {
+            phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value;
+        }
         // getting the required tdata to store to our db
-        const phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value;
-        const transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1].Value;
-        const ammount = callback_result.Body.stkCallback.CallbackMetadata.Item[0].Value;
+        var phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value.toString();
+        var transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1].Value;
+        var ammount = callback_result.Body.stkCallback.CallbackMetadata.Item[0].Value;
+
+        // if (phone.length > 12){
+        //     phone = callback_result.Body.stkCallback.CallbackMetadata.Item[3].Value;
+        // }else{
+        //     phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value;
+        // }
 
         try {
-            const userpaid = await prisma.user.findUnique({
-                where: {
-                    phone: phone
-                }
-            })
-
-            console.log('User paid is ' + userpaid)
 
             const payment = await prisma.payment.create({
                 data: {
@@ -92,15 +99,31 @@ module.exports = {
                     number: phone
                 }
             })
-                .then((response) => {
+                .then(async (response) => {
                     console.log(response);
                     let recipient = parseInt(response.number);
-                    let amount = parseInt(response.amount)
+                    let amount = parseInt(response.amount);
+                    let usernumber = response.number.substring(3);
+
+                    const userpaid = await prisma.user.findUnique({
+                        where: {
+                            phone: usernumber
+                        }
+                    })
+                    console.log('User paid is ' + userpaid.first_name);
+                    res.json({ userpaid: userpaid.first_name });
+                    // .then((result) => {
+                    //     console.log('User paid is ' + result.first_name);
+                    //     res.json({ userpaid: result.first_name });
+
+                    // })
+
+
                     // send text to user
-                    if (!response.userpaid) {
+                    if (!userpaid) {
                         sendSms(phone, `Hello ${recipient} your payment of Kshs ${amount} has been received for account number ${recipient}`)
                     }
-                    sendSms(phone, `Hello ${response.userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`)
+                    sendSms(phone, `Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`)
                     // res.json({ 'response': response });
                 })
         } catch (error) {
@@ -116,12 +139,12 @@ module.exports = {
                 where: {
                     id: req.session.user.id
                 }
-            }).then((response)=>{
+            }).then((response) => {
                 console.log(response)
                 res.json({ transactions: response.payment })
             })
         } catch (error) {
-            res.json({error:error.message})
+            res.json({ error: error.message })
         }
 
     }
