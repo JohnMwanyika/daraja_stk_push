@@ -168,7 +168,7 @@ module.exports = {
   signUpApi: async (req, res) => {
     try {
       const { first_name, last_name, email } = req.body;
-      const phone = parseInt(req.body.phone);
+      const phone = req.body.phone;
       var pass = req.body.password;
 
       let userExists = await prisma.user.findUnique({
