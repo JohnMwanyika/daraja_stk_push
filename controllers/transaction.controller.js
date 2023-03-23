@@ -101,6 +101,7 @@ module.exports = {
             })
                 .then(async (response) => {
                     console.log(response);
+                    let paymentId = response.id;
                     let recipient = parseInt(response.number);
                     let amount = parseInt(response.amount);
                     let usernumber = response.number.substring(3);
@@ -111,17 +112,21 @@ module.exports = {
                         }
                     })
                     console.log('User paid is ' + userpaid.first_name);
-                    res.json({ userpaid: userpaid.first_name });
-                    // .then((result) => {
-                    //     console.log('User paid is ' + result.first_name);
-                    //     res.json({ userpaid: result.first_name });
+                    // res.json({ userpaid: userpaid.first_name });
 
-                    // })
-
-
+                    const updated_transaction = await prisma.payment.update({
+                        where:{
+                            id:paymentId
+                        },
+                        data:{
+                            userId:userpaid.id
+                        }
+                    });
+                    res.json({ userpaid: userpaid.first_name,updatedTransaction:updated_transaction });
                     // send text to user
                     if (!userpaid) {
                         sendSms(phone, `Hello ${recipient} your payment of Kshs ${amount} has been received for account number ${recipient}`)
+                        
                     }
                     sendSms(phone, `Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`)
                     // res.json({ 'response': response });
