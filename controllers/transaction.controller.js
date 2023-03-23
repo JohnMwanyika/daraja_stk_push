@@ -115,18 +115,18 @@ module.exports = {
                     // res.json({ userpaid: userpaid.first_name });
 
                     const updated_transaction = await prisma.payment.update({
-                        where:{
-                            id:paymentId
+                        where: {
+                            id: paymentId
                         },
-                        data:{
-                            userId:userpaid.id
+                        data: {
+                            userId: userpaid.id
                         }
                     });
-                    res.json({ userpaid: userpaid.first_name,updatedTransaction:updated_transaction });
+                    res.json({ userpaid: userpaid.first_name, updatedTransaction: updated_transaction });
                     // send text to user
                     if (!userpaid) {
                         sendSms(phone, `Hello ${recipient} your payment of Kshs ${amount} has been received for account number ${recipient}`)
-                        
+
                     }
                     sendSms(phone, `Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`)
                     // res.json({ 'response': response });
@@ -140,10 +140,11 @@ module.exports = {
             const userId = req.session.user.id;
             console.log(userId);
             user = await prisma.user.findUnique({
-                include: { payment: true },
+                include: { payment: {orderBy: { id: "desc" }} },
                 where: {
                     id: req.session.user.id
-                }
+                },
+                // orderBy: { id: "desc" },
             }).then((response) => {
                 console.log(response)
                 res.json({ transactions: response.payment })
