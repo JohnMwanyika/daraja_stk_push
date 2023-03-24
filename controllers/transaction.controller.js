@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const axios = require('axios');
 const { response } = require('express');
 const sendSms = require('../utils/sendSms');
-
+const moment = require('moment');
 
 module.exports = {
     stkPush: async (req, res) => {
@@ -70,50 +70,51 @@ module.exports = {
             return res.json('Ok');
         }
         // - else we receive the callbackMetadata and store the information to our db
-        console.log(callback_result.Body.stkCallback.CallbackMetadata);
+        console.log(callback_result.Body.stkCallback.CallbackMetadata.Item);
 
-        var correct_phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value;
-
-        if (correct_phone.length > 12) {
-            phone = callback_result.Body.stkCallback.CallbackMetadata.Item[3].Value;
-        } else {
-            phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value;
-        }
-        // getting the required tdata to store to our db
-        var phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value.toString();
-        var transcId = callback_result.Body.stkCallback.CallbackMetadata.Item[1].Value;
-        var ammount = callback_result.Body.stkCallback.CallbackMetadata.Item[0].Value;
-
-        // if (phone.length > 12){
-        //     phone = callback_result.Body.stkCallback.CallbackMetadata.Item[3].Value;
-        // }else{
-        //     phone = callback_result.Body.stkCallback.CallbackMetadata.Item[4].Value;
-        // }
+        const response = callback_result.Body.stkCallback.CallbackMetadata;
+        // initialize an empty result object
+        const result = {};
+        // iterate through the response Items
+        response.Item.forEach(item => {
+            // store each item in the result object
+            result[item.Name] = item.Value
+        });
+        // assign individual item for clean code and redability
+        const phone = result.PhoneNumber.toString();
+        const transcId = result.MpesaReceiptNumber;
+        const amount = result.Amount;
+        const dateString = result.TransactionDate;
+        // convert date string to a format that db understands
+        const date = moment(dateString, 'YYYYMMDDHHmmss').toDate()
 
         try {
-
+            // store the transaction in our database
             const payment = await prisma.payment.create({
                 data: {
                     transc_id: transcId,
-                    amount: ammount,
-                    number: phone
+                    amount: amount,
+                    number: phone,
+                    transaction_date: date
                 }
             })
                 .then(async (response) => {
-                    console.log(response);
+                    // get the newly saved transaction's Id
                     let paymentId = response.id;
+                    // phone number of the paying client
                     let recipient = parseInt(response.number);
+                    // ammount paid
                     let amount = parseInt(response.amount);
+                    // removing 254 from client's number
                     let usernumber = response.number.substring(3);
-
+                    // check if client paying is in our database
                     const userpaid = await prisma.user.findUnique({
                         where: {
                             phone: usernumber
                         }
                     })
                     console.log('User paid is ' + userpaid.first_name);
-                    // res.json({ userpaid: userpaid.first_name });
-
+                    // if the user exists in our database, we update their transaction by appending their Id in the record
                     const updated_transaction = await prisma.payment.update({
                         where: {
                             id: paymentId
@@ -122,11 +123,11 @@ module.exports = {
                             userId: userpaid.id
                         }
                     });
-                    res.json({ userpaid: userpaid.first_name, updatedTransaction: updated_transaction });
+                    // res.json({ userpaid: userpaid.first_name, updatedTransaction: updated_transaction });
                     // send text to user
                     if (!userpaid) {
+                        // if user paying is not in our database we'll respond with their number else well use their first name
                         sendSms(phone, `Hello ${recipient} your payment of Kshs ${amount} has been received for account number ${recipient}`)
-
                     }
                     sendSms(phone, `Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`)
                     // res.json({ 'response': response });
@@ -139,8 +140,9 @@ module.exports = {
         try {
             const userId = req.session.user.id;
             console.log(userId);
-            user = await prisma.user.findUnique({
-                include: { payment: {orderBy: { id: "desc" }} },
+
+            const user = await prisma.user.findUnique({
+                include: { payment: { orderBy: { id: "desc" } } },
                 where: {
                     id: req.session.user.id
                 },
@@ -152,6 +154,5 @@ module.exports = {
         } catch (error) {
             res.json({ error: error.message })
         }
-
     }
 };

@@ -277,13 +277,13 @@ body(class="d-flex align-items-center bg-light-green")
                                 { title: 'Phone', data: 'number' },
                                 { title: 'Transaction ID', data: 'transc_id' },
                                 { title: 'Amount', data: 'amount' },
-                                { title: 'Date Paid' }
+                                { title: 'Date Paid',data:'transaction_date' }
                             ],
                             scrollY: 250,
                             columnDefs: [
                                 {
                                     targets: [3],
-                                    //- title:'Date Paid',
+                                    title:'Date Paid',
                                     render: function(data) {
                                         return moment(data).format("YYYY-MM-DD HH:mm:ss");
                                     }
@@ -314,7 +314,7 @@ body(class="d-flex align-items-center bg-light-green")
                     .fail(function(error){
                         Toast.fire({
                             icon: "error",
-                            title: `${error.message}`
+                            title: `Request timeout err:${error.status}!`
                         });
                     })
                 };
