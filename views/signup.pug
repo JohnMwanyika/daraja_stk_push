@@ -52,7 +52,7 @@ body(class="d-flex align-items-center bg-light-green")
 
                                         Phone
 
-                                    input.form-control(type="number" placeholder="Your phone" name="phone")
+                                    input.form-control(type="text" maxlength='10' placeholder="Your phone" name="phone" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))")
                         .row
                             .col-12
                                 .mb-4
