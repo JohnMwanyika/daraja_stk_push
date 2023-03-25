@@ -111,7 +111,7 @@ module.exports = {
                     // check if client paying is in our database
                     const userpaid = await prisma.user.findUnique({
                         where: {
-                            phone: usernumber
+                            phone: `0${usernumber}`
                         }
                     })
                     console.log('User paid is ' + userpaid.first_name);
