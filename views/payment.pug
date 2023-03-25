@@ -32,7 +32,13 @@ link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.boo
 script(src="assets/js/jquery.dataTables.min.js")
 script(src="assets/js/dataTables.bootstrap5.min.js")
 //- require moment
-script(src="assets/js/moment.js") 
+//- script(src="assets/js/moment.js")
+//- script(src="assets/js/moment-timezone-with-data-1970-2030.js")
+
+<!-- Moment.js and Moment Timezone scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.32/moment-timezone-with-data-10-year-range.min.js"></script>
+
 
 body(class="d-flex align-items-center bg-light-green")
 
@@ -239,6 +245,7 @@ body(class="d-flex align-items-center bg-light-green")
             });
 
         script.
+            //- const moment = new moment-timezone();
 
             //- fetch user transactions
             $( document ).ready(function(){
@@ -285,7 +292,8 @@ body(class="d-flex align-items-center bg-light-green")
                                     targets: [3],
                                     title:'Date Paid',
                                     render: function(data) {
-                                        return moment(data).format("YYYY-MM-DD HH:mm:ss");
+                                        //- return formatDateTime(data)
+                                        return moment(data).format('lll');
                                     }
                                 },
                                 {
@@ -310,6 +318,26 @@ body(class="d-flex align-items-center bg-light-green")
                             const maskedMiddle = "*".repeat(mobileNumber.length - 8);
                             return `${firstFour}${maskedMiddle}${lastTwo}`;
                         }
+
+                        function formatDateTime(dateTimeString) {
+                        // Create a new Date object for the input time in the local time zone
+                            const inputTime = new Date(dateTimeString);
+
+                            // Extract the individual date and time components
+                            const year = inputTime.getFullYear();
+                            const month = String(inputTime.getMonth() + 1).padStart(2, '0');
+                            const day = String(inputTime.getDate()).padStart(2, '0');
+                            const hours = String(inputTime.getHours()).padStart(2, '0');
+                            const minutes = String(inputTime.getMinutes()).padStart(2, '0');
+                            const seconds = String(inputTime.getSeconds()).padStart(2, '0');
+
+                            // Format the date and time components as a string
+                            const outputString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+                            // Return the formatted string
+                            return outputString;
+                        }
+
                     })
                     .fail(function(error){
                         Toast.fire({

@@ -80,6 +80,7 @@ module.exports = {
             // store each item in the result object
             result[item.Name] = item.Value
         });
+        console.log('This is what is gonna be saved to db '+result)
         // assign individual item for clean code and redability
         const phone = result.PhoneNumber.toString();
         const transcId = result.MpesaReceiptNumber;
@@ -123,14 +124,15 @@ module.exports = {
                             userId: userpaid.id
                         }
                     });
-                    // res.json({ userpaid: userpaid.first_name, updatedTransaction: updated_transaction });
                     // send text to user
                     if (!userpaid) {
                         // if user paying is not in our database we'll respond with their number else well use their first name
                         sendSms(phone, `Hello ${recipient} your payment of Kshs ${amount} has been received for account number ${recipient}`)
                     }
                     sendSms(phone, `Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`)
-                    // res.json({ 'response': response });
+                    //send whatsapp message
+                    // const {whatsappText} = require('../utils/whatsapp')
+                    // whatsappText(usernumber,`Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`);
                 })
         } catch (error) {
             console.log(error.message)
