@@ -292,8 +292,9 @@ body(class="d-flex align-items-center bg-light-green")
                                     targets: [3],
                                     title:'Date Paid',
                                     render: function(data) {
-                                        //- return formatDateTime(data)
-                                        return moment(data).format('lll');
+                                        //- let date = data.toLocaleString()
+                                        let rez = getTimeInZoneMinus3(data)
+                                        return moment(rez).format('lll');
                                     }
                                 },
                                 {
@@ -319,23 +320,29 @@ body(class="d-flex align-items-center bg-light-green")
                             return `${firstFour}${maskedMiddle}${lastTwo}`;
                         }
 
-                        function formatDateTime(dateTimeString) {
-                        // Create a new Date object for the input time in the local time zone
-                            const inputTime = new Date(dateTimeString);
+                        function getTimeInZoneMinus3(date) {
+                            // Create a new Date object from the provided date string
+                            const inputDate = new Date(date);
 
-                            // Extract the individual date and time components
-                            const year = inputTime.getFullYear();
-                            const month = String(inputTime.getMonth() + 1).padStart(2, '0');
-                            const day = String(inputTime.getDate()).padStart(2, '0');
-                            const hours = String(inputTime.getHours()).padStart(2, '0');
-                            const minutes = String(inputTime.getMinutes()).padStart(2, '0');
-                            const seconds = String(inputTime.getSeconds()).padStart(2, '0');
+                            // Convert the input date to UTC
+                            const utcDate = new Date(Date.UTC(
+                                inputDate.getFullYear(),
+                                inputDate.getMonth(),
+                                inputDate.getDate(),
+                                inputDate.getHours(),
+                                inputDate.getMinutes(),
+                                inputDate.getSeconds(),
+                                inputDate.getMilliseconds()
+                            ));
 
-                            // Format the date and time components as a string
-                            const outputString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                            // Create a new date object that is 3 hours behind UTC
+                            const utcMinus3 = new Date(utcDate.getTime() - 3 * 60 * 60 * 1000);
 
-                            // Return the formatted string
-                            return outputString;
+                            // Format the UTC-3 time as a string
+                            const formattedTime = utcMinus3.toISOString().replace('T', ' ').replace(/\.\d{3}Z/, '');
+
+                            // Return the formatted UTC-3 time as a string
+                            return formattedTime;
                         }
 
                     })
