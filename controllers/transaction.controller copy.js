@@ -80,7 +80,7 @@ module.exports = {
             // store each item in the result object
             result[item.Name] = item.Value
         });
-        console.log('This is what is gonna be saved to db ' + result)
+        console.log('This is what is gonna be saved to db '+result)
         // assign individual item for clean code and redability
         const phone = result.PhoneNumber.toString();
         const transcId = result.MpesaReceiptNumber;
@@ -109,47 +109,31 @@ module.exports = {
                     // removing 254 from client's number
                     let usernumber = response.number.substring(3);
                     // check if client paying is in our database
-                    const userPaid = await prisma.user.findUnique({
-                        include: { payment: true },
+                    const userpaid = await prisma.user.findUnique({
                         where: {
                             phone: `0${usernumber}`
                         }
                     })
-                    return { userPaid, paymentId, recipient, amount }
-                })
-                .then(async (data) => {
-                    console.log('User paid is ' + data.userPaid.first_name);
-                    // console.log(data)
+                    console.log('User paid is ' + userpaid.first_name);
                     // if the user exists in our database, we update their transaction by appending their Id in the record
                     const updated_transaction = await prisma.payment.update({
                         where: {
-                            id: data.paymentId
+                            id: paymentId
                         },
                         data: {
-                            userId: data.userPaid.id
+                            userId: userpaid.id
                         }
                     });
-
-                    const userBill = await prisma.bill.findMany({
-                        where: { userId: data.userPaid.id }
-                    })
-                    console.log(`${data.userPaid.first_name}'s bill is`)
-                    console.log(userBill)
-
                     // send text to user
-                    if (!data.userPaid) {
-                        console.log('User paying is not in the system')
+                    if (!userpaid) {
                         // if user paying is not in our database we'll respond with their number else well use their first name
-                        // sendSms(phone, `Hello ${data.recipient} your payment of Kshs ${amount} has been received for account number ${recipient}`)
+                        sendSms(phone, `Hello ${recipient} your payment of Kshs ${amount} has been received for account number ${recipient}`)
                     }
-                    console.log(`Hello ${data.userPaid.first_name} your payment of Kshs ${data.amount} has been received for account number ${data.recipient}`)
-                    // sendSms(phone, `Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`)
+                    sendSms(phone, `Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`)
                     //send whatsapp message
                     // const {whatsappText} = require('../utils/whatsapp')
                     // whatsappText(usernumber,`Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`);
                 })
-
-
         } catch (error) {
             console.log(error.message)
         }
