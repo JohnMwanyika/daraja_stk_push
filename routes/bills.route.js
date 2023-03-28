@@ -6,6 +6,6 @@ const { billForm, getBillApi, createBill } = require('../controllers/bills.contr
 router.get('/', billForm)
 
 router.get('/user_bill', getBillApi);
-router.get('/new_bill', createBill);
+router.post('/new_bill', createBill);
 
 module.exports = router

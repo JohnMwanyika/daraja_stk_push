@@ -94,10 +94,10 @@ html(lang="en")
                         .align-items-center.text-center
                             .col-12
                                 //-   Button 
-                                button.btn.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push 
+                                button.btn.btn-success.mt-6.mb-2(type="submit")#submitbtn Create bill 
                                     span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
                             .col-12.mb-4
-                                small.mb-4.text-muted
+                                //- small.mb-4.text-muted
                                     | #{user.first_name} | 
                                     a.text-success.fw-semibold(href="/logout") Sign Out
 
@@ -190,15 +190,10 @@ html(lang="en")
                     //- get form
                     var form = $("#myForm");
                     //- make sure empty form is not submitted
-                    if ($('#phone').val() == "" || $('.amount').val() == "") {
+                    if ($('#user').val() == "" || $('.amount').val() == "") {
                         Toast.fire({
                             icon: "error",
                             title: "All fields are required"
-                        });
-                    }else if ($('#phone').val().length != 10 ){
-                        Toast.fire({
-                            icon: "error",
-                            title: "Enter a valid phone number..."
                         });
                     }else if ($('.amount').val() < 1){
                         Toast.fire({
@@ -222,24 +217,23 @@ html(lang="en")
                                 //- listenToCallback();
                             },
                             success: function(data){
-                                let rescode = data.response.ResponseCode;
-                                console.log(data.response.ResponseCode)
-                                //- alert(data);
-                                if(data.response.ResponseCode == '0'){
-                                    //- Clears The form fields
-                                    form[0].reset();
-                                    Toast.fire({
-                                        //- icon: data.message.type,
-                                        icon: 'success',
-                                        title:'Enter your mpesa password...',
-                                        timer:false
-                                    });
-                                }else{
-                                    Toast.fire({
-                                        icon: "error",
-                                        title: "Oops! an error occured try again"
-                                    });
-                                }
+                                let response = data;
+                                console.log(data)
+                                //- if(data.response.ResponseCode == '0'){
+                                //-     //- Clears The form fields
+                                //-     form[0].reset();
+                                //-     Toast.fire({
+                                //-         //- icon: data.message.type,
+                                //-         icon: 'success',
+                                //-         title:'Enter your mpesa password...',
+                                //-         timer:false
+                                //-     });
+                                //- }else{
+                                //-     Toast.fire({
+                                //-         icon: "error",
+                                //-         title: "Oops! an error occured try again"
+                                //-     });
+                                //- }
                             },
                             timeout: 10000,
                             error: function (request, status, error) {
@@ -250,7 +244,19 @@ html(lang="en")
                                 });
                             }
 
-                        });
+                        }).done(function(data){
+                            console.log(data)
+                            Toast.fire({
+                                icon: "success",
+                                title: data
+                            });
+                            window.location.href = '/billing'
+                        }).fail(function(err){
+                            Toast.fire({
+                                icon: "error",
+                                title: err
+                            });
+                        })
                     }
                 });
 
@@ -295,7 +301,8 @@ html(lang="en")
                                     { title: 'User', data: 'userId' },
                                     { title: 'Amount', data: 'amount' },
                                     { title: 'Date billed',data:'created_at' },
-                                    { title: 'Status',data:'bill_statusId' }
+                                    { title: 'Status',data:'bill_statusId' },
+                                    { title: 'Action' }
                                 ],
                                 scrollY: 250,
                                 columnDefs: [
@@ -307,6 +314,12 @@ html(lang="en")
                                             return moment(rez).format('lll');
                                         }
                                     },
+                                    {
+                                        targets:[4],
+                                        render: function(data){
+                                            return `<a href="/payment" class="btn btn-primary">Make Payment</a>`
+                                        }
+                                    }
                                 ]
                             });
 
@@ -352,7 +365,7 @@ html(lang="en")
                     };
 
                     $('#refresh').click(function(){
-                        window.location.href = '/payment'
+                        window.location.href = '/billing'
                     });
 
                 })
