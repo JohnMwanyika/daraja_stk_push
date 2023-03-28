@@ -1,0 +1,358 @@
+doctype
+doctype html
+html(lang="en")
+    head 
+        meta(charset="utf-8")
+        meta(name="viewport" content="width=device-width,initial-scale=1")
+        meta(content="Webinning" name="author")
+        //  Theme CSS 
+        link#stylesheetLTR(rel="stylesheet" href="assets/css/theme.bundle.css")
+        link#stylesheetRTL(rel="stylesheet" href="assets/css/theme.rtl.bundle.css")
+        link(rel="preconnect" href="https://fonts.gstatic.com/", crossorigin)
+        link(rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap")
+        link(rel="stylesheet" media="print" onload="this.onload=null;this.removeAttribute(\'media\');" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap")
+        //  no-JS fallback 
+        noscript.
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&amp;display=swap">
+        //- Icofont
+        <link rel="stylesheet" href="assets/css/icofont.min.css">
+
+        //- sweet alert
+        script(src="https://cdn.jsdelivr.net/npm/sweetalert2@10")
+        //- jquery
+        script(src="assets/js/jquery.min.js")
+
+        //- //  Favicon 
+        //- link(rel="icon" href="assets/favicon/favicon.ico" sizes="any")
+        link(rel="icon" href="assets/icon/favicon.png" sizes="any")
+
+
+        title #{title}
+
+        //- jquery table
+        link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css")
+        link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css")
+        //- script(src="https://code.jquery.com/jquery-3.6.4.min.js")
+        script(src="assets/js/jquery.dataTables.min.js")
+        script(src="assets/js/dataTables.bootstrap5.min.js")
+        //- require moment
+        //- script(src="assets/js/moment.js")
+        //- script(src="assets/js/moment-timezone-with-data-1970-2030.js")
+
+        <!-- Moment.js and Moment Timezone scripts -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.32/moment-timezone-with-data-10-year-range.min.js"></script>
+
+
+    body(class="d-flex align-items-center bg-light-green")
+
+        main.container
+
+            .row.align-items-center.justify-content-center.vh-100
+                //- .col-11.col-sm-8.col-md-6.col-lg-5.col-xl-4.col-xxl-3.py-6
+                .col-md-7.col-lg-6.d-flex.flex-column.py-6
+                    //  Title 
+                    h1.mb-2.text-center New Bill
+                        //- span
+                        //-     img(src="assets/icon/lipanampesa.png" height="" width="200px" alt="...")
+
+                    //  Subtitle 
+                    p.text-secondary.text-center.
+
+                        Enter your phone number and amount to be paid
+                    //  Form 
+                    form(action="/billing/new_bill" method="post")#myForm
+                        .row.mx-sm-7.mx-lg-7
+                            .col-lg-12
+                                .mb-4.mx-sm-7
+                                    //  Label 
+                                    label.form-label.
+
+                                        User
+
+                                    //  Input 
+                                    //- input.form-control(type="text" placeholder="E.g 07xxxx.." name='phone',required, value=`${user.phone}`)#phone
+                                    select.form-control#user(name="userId")
+                                        option(value=`${user.id}`) #{user.first_name} #{user.last_name}
+                                //- .col-lg-6
+                                //  Password 
+                                .mb-4.mx-sm-7
+                                    .row
+                                        .col
+                                            //  Label 
+                                            label.form-label.
+
+                                                Amount
+
+                                        .col-auto
+                                            //  Help text 
+                                            //- a.form-text.small.text-muted.link-primary(href="reset-password-illustration.html") Forgot password
+                                    .input-group
+                                        input.form-control(type="number" autocomplete="off", data-toggle-password-input, placeholder="E.g 10" name="amount",required).amount
+                                        //- button.input-group-text.px-4.text-secondary.link-primary(type="button", data-toggle-password)
+
+                        .align-items-center.text-center
+                            .col-12
+                                //-   Button 
+                                button.btn.btn-success.mt-6.mb-2(type="submit")#submitbtn Send push 
+                                    span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#spina
+                            .col-12.mb-4
+                                small.mb-4.text-muted
+                                    | #{user.first_name} | 
+                                    a.text-success.fw-semibold(href="/logout") Sign Out
+
+                .col-md-5.col-lg-6.px-lg-4.px-xl-6.d-lg-block
+                    //  Image 
+                    div
+                        .container
+                            .row
+                                .col-md-12.border-primary.bg-light.p-4
+
+                                    .panel.panel-primary
+                                        .d-flex.justify-content-between.mb-3
+                                            h3.panel-title.text-primary Bill Summary
+                                            button.btn.btn-sm.btn-secondary(type="button")#refresh Refresh
+                                                //- <i class="icofont-download"></i>
+
+                                        .table-responsive
+                                            table#bill-table.table.table-hover.table-sm.table-borderless.border.mb-0
+                                                thead.thead-light
+                                                    //- tr
+                                                        th
+                                                            a.text-muted.list-sort(href="javascript: void(0);" data-sort="id").
+
+                                                                No.
+
+                                                        th
+                                                            a.text-muted.list-sort(href="javascript: void(0);" data-sort="name").
+
+                                                                User
+
+                                                        th
+                                                            a.text-muted.list-sort(href="javascript: void(0);" data-sort="manager").
+
+                                                                Amount
+
+                                                        th
+                                                            a.text-muted.list-sort(href="javascript: void(0);" data-sort="status").
+
+                                                                Date billed
+                                                        th
+                                                            a.text-muted.list-sort(href="javascript: void(0);" data-sort="status").
+
+                                                                Status
+
+                                                tbody.list
+                                                    p#info.text-center Fetching bill... 
+                                                        span.spinner-border.spinner-border-sm(role="status" aria-hidden="true")#loadingData
+
+                    if (message)
+                        script.
+                            console.log(message)
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: 'top',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                }
+                            })
+                            Toast.fire({
+                                icon: message.type,
+                                title:message.info.message
+                            });
+            //- main js
+            //- script(src="assets/js/theme.bundle.js")
+
+            script.
+                //- var table = $('#myTable').DataTable();
+                var loading = $('#spina').hide();
+
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+
+
+
+                $("#submitbtn").click(function(event){
+                    event.preventDefault();
+                    //- get form
+                    var form = $("#myForm");
+                    //- make sure empty form is not submitted
+                    if ($('#phone').val() == "" || $('.amount').val() == "") {
+                        Toast.fire({
+                            icon: "error",
+                            title: "All fields are required"
+                        });
+                    }else if ($('#phone').val().length != 10 ){
+                        Toast.fire({
+                            icon: "error",
+                            title: "Enter a valid phone number..."
+                        });
+                    }else if ($('.amount').val() < 1){
+                        Toast.fire({
+                            icon: "error",
+                            title: "Invalid amount",
+                        });
+                    }else{
+                        $.ajax({
+                            url:form.attr('action'),
+                            type:form.attr('method'),
+                            data: form.serialize(),
+                            beforeSend: function(){
+                                loading.show(function(){
+                                    $("#submitbtn").prop("disabled", true);
+                                });
+                            },
+                            complete: function(){
+                                loading.hide(function(){
+                                    $("#submitbtn").removeAttr('disabled');
+                                });
+                                //- listenToCallback();
+                            },
+                            success: function(data){
+                                let rescode = data.response.ResponseCode;
+                                console.log(data.response.ResponseCode)
+                                //- alert(data);
+                                if(data.response.ResponseCode == '0'){
+                                    //- Clears The form fields
+                                    form[0].reset();
+                                    Toast.fire({
+                                        //- icon: data.message.type,
+                                        icon: 'success',
+                                        title:'Enter your mpesa password...',
+                                        timer:false
+                                    });
+                                }else{
+                                    Toast.fire({
+                                        icon: "error",
+                                        title: "Oops! an error occured try again"
+                                    });
+                                }
+                            },
+                            timeout: 10000,
+                            error: function (request, status, error) {
+                                //- alert(request,status);
+                                Toast.fire({
+                                    icon: "error",
+                                    title: "Request time out try again!"
+                                });
+                            }
+
+                        });
+                    }
+                });
+
+            script.
+                //- const moment = new moment-timezone();
+
+                //- fetch user transactions
+                $( document ).ready(function(){
+                    let spinner = $('#loadingData').hide();
+
+                    fetchUserBill();
+                    //- refresh on btn click
+
+                    function fetchUserBill(){
+                        $.ajax({
+                            url:'/billing/user_bill',
+                            type:'get',
+                            beforeSend: function(){
+                                spinner.show();
+                            },
+                            complete: function(){
+                                spinner.hide(function(){
+                                    $('#info').hide();
+                                });
+                            },
+                            timeout: 12000,
+                            //- error: function (request, status, error) {
+                            //-     Toast.fire({
+                            //-         icon: "error",
+                            //-         title: "Request time out try again!"
+                            //-     });
+                            //- }
+                        })
+                        .done(function(data){
+                            let bill = data.bill.bill;
+
+                            console.log(bill)
+                            $('#bill-table').DataTable({
+                                data:data.bill.bill,
+                                columns: [
+                                    //- { title: 'No', data: 'Id' },
+                                    { title: 'User', data: 'userId' },
+                                    { title: 'Amount', data: 'amount' },
+                                    { title: 'Date billed',data:'created_at' },
+                                    { title: 'Status',data:'bill_statusId' }
+                                ],
+                                scrollY: 250,
+                                columnDefs: [
+                                    {
+                                        targets: [2],
+                                        title:'Date billed',
+                                        render: function(data) {
+                                            let rez = getTimeInZoneMinus3(data)
+                                            return moment(rez).format('lll');
+                                        }
+                                    },
+                                ]
+                            });
+
+                            Toast.fire({
+                                icon: "success",
+                                title: `success`,
+                                position: 'top-end',
+                                heightAuto:false
+                            });
+
+                            function getTimeInZoneMinus3(date) {
+                                // Create a new Date object from the provided date string
+                                const inputDate = new Date(date);
+
+                                // Convert the input date to UTC
+                                const utcDate = new Date(Date.UTC(
+                                    inputDate.getFullYear(),
+                                    inputDate.getMonth(),
+                                    inputDate.getDate(),
+                                    inputDate.getHours(),
+                                    inputDate.getMinutes(),
+                                    inputDate.getSeconds(),
+                                    inputDate.getMilliseconds()
+                                ));
+
+                                // Create a new date object that is 3 hours behind UTC
+                                const utcMinus3 = new Date(utcDate.getTime() - 3 * 60 * 60 * 1000);
+
+                                // Format the UTC-3 time as a string
+                                const formattedTime = utcMinus3.toISOString().replace('T', ' ').replace(/\.\d{3}Z/, '');
+
+                                // Return the formatted UTC-3 time as a string
+                                return formattedTime;
+                            }
+
+                        })
+                        .fail(function(error){
+                            Toast.fire({
+                                icon: "error",
+                                title: `Request timeout err:${error.status}!`
+                            });
+                        })
+                    };
+
+                    $('#refresh').click(function(){
+                        window.location.href = '/payment'
+                    });
+
+                })

@@ -41,15 +41,20 @@ app.use(
     })
 );
 
-// const prisma = new PrismaClient();
 
 
 app.listen(port, () => {
     console.log(`app listening on localhost: ${port}`);
 });
 
+// Require all routes here
 const signinRoute = require('./routes/login.route');
-app.use('/', signinRoute)
+const billingRoute = require('./routes/bills.route');
+app.use('/', signinRoute);
+
+// billing route
+app.use('/billing', billingRoute);
+//res.render('billing', { title: 'Customer Billing', user: req.session.user })
 
 app.get('/signup', (req, res) => {
     res.render('signup', { title: 'Sign up to Lipa' })

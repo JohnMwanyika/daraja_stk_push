@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lipa | </title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" />
+    <script src="assets/js/jquery.dataTables.min.js"></script>
+    <script src="assets/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <!-- <div class="d-flex align-items-center justify-content-center" style="height: 100vh;"></div> -->
+    <div class="container" style="height: 100vh;">
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <h2>New Bill</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="item">Item:</label>
+                        <input type="text" class="form-control" id="item" name="item" />
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price:</label>
+                        <input type="number" class="form-control" id="price" name="price" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Item</button>
+                </form>
+            </div>
+            <div class="col-md-8">
+                <h2>Bill Summary</h2>
+                <table class="table" id="bill">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bill-items"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td>Total:</td>
+                            <td id="bill-total">$0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('#bill').Datatable();
+            // submit billing form using AJAX
+            $("form").submit(function (event) {
+                event.preventDefault();
+                var formData = $(this).serialize();
+                $.ajax({
+                    url: "create_bill.php",
+                    type: "POST",
+                    data: formData,
+                    success: function (data) {
+                        // add new item to bill table
+                        var item = data.item;
+                        var price = data.price;
+                        var total = data.total;
+                        $("#bill-items").append(
+                            "<tr><td>" +
+                            item +
+                            "</td><td>$" +
+                            price +
+                            "</td></tr>"
+                        );
+                        $("#bill-total").html("$" + total.toFixed(2));
+                        // reset billing form
+                        $("form")[0].reset();
+                    },
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

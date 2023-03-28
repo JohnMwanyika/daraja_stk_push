@@ -2,7 +2,7 @@ require('dotenv').config();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const axios = require('axios');
-const { response } = require('express');
+// const { response } = require('express');
 const sendSms = require('../utils/sendSms');
 const moment = require('moment');
 
@@ -220,5 +220,16 @@ module.exports = {
         } catch (error) {
             res.json({ error: error.message })
         }
-    }
+    },
+    // getBill: async (req, res) => {
+    //     const userBill = await prisma.user.findUnique({
+    //         include: { bill: true },
+    //         where: {
+    //             id: req.session.user.id
+    //         }
+    //     })
+    //         .then((data) => {
+    //             console.log(data)
+    //         })
+    // }
 };
