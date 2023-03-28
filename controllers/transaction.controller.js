@@ -11,6 +11,7 @@ module.exports = {
         // capture the number of client paying and amount to be paid
         const phone = req.body.phone.substring(1); //removes zero on phone number
         const amount = req.body.amount;
+        // const accountNumber = req.body.amount;
 
         // generating timestamp using js
         const date = new Date();
@@ -130,20 +131,67 @@ module.exports = {
                         }
                     });
 
-                    const userBill = await prisma.bill.findMany({
-                        where: { userId: data.userPaid.id }
+                    const userBill = await prisma.user.findUnique({
+                        include: { bill: true },
+                        where: { id: data.userPaid.id }
                     })
-                    console.log(`${data.userPaid.first_name}'s bill is`)
-                    console.log(userBill)
-
+                    const billedAmount = userBill.bill[0].amount;
+                    const paidAmount = updated_transaction.amount;
+                    const mpesaRef = updated_transaction.transc_id;
+                    // console.log(`${data.userPaid.first_name}'s total bill is ${billedAmount} and paid amount ${paidAmount} total outstanding is ${billedAmount - paidAmount}`)
+                    // function to calculate the balance remaining after a payment is made
+                    function calculateBalance(bill, payment) {
+                        let balance;
+                        balance = bill - payment;
+                        console.log(`Total bill is ${bill} and paid amount ${payment} total outstanding is ${balance}`)
+                        return balance;
+                    };
+                    const userBalance = calculateBalance(billedAmount, paidAmount);
+                    console.log(userBalance);
+                    if (userBalance > 0) {
+                        const updatedBill = await prisma.bill.update({
+                            where: {
+                                id: userBill.bill[0].id
+                            },
+                            data: {
+                                amount: userBalance,
+                                bill_statusId: 2
+                            }
+                        })
+                    } else if (userBalance == 0) {
+                        const updatedBill = await prisma.bill.update({
+                            where: {
+                                id: userBill.bill[0].id
+                            },
+                            data: {
+                                amount: userBalance,
+                                bill_statusId: 4
+                            }
+                        })
+                    } else {
+                        const updatedBill = await prisma.bill.update({
+                            where: {
+                                id: userBill.bill[0].id
+                            },
+                            data: {
+                                amount: userBalance,
+                                bill_statusId: 4
+                            }
+                        })
+                        let extra = updatedBill.amount;
+                        extra = Math.abs(extra);
+                        console.log(`You have paid an extra ${extra},you shudnt pay more next time`);
+                        console.log(updatedBill);
+                    }
                     // send text to user
                     if (!data.userPaid) {
                         console.log('User paying is not in the system')
                         // if user paying is not in our database we'll respond with their number else well use their first name
-                        // sendSms(phone, `Hello ${data.recipient} your payment of Kshs ${amount} has been received for account number ${recipient}`)
+                        sendSms(phone, `Hi ${data.userPaid.first_name}, your payment of Kshs ${data.amount} has been received successfully, Mpesa Ref: ${mpesaRef}, Bill Amount: ${billedAmount}, Total paid:${paidAmount}, Amount Due: ${userBalance}`)
                     }
-                    console.log(`Hello ${data.userPaid.first_name} your payment of Kshs ${data.amount} has been received for account number ${data.recipient}`)
-                    // sendSms(phone, `Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`)
+                    // console.log(`Hello ${data.userPaid.first_name} your payment of Kshs ${data.amount} has been received for account number ${data.recipient}`)
+                    console.log(`Hi ${data.userPaid.first_name}, your payment of Kshs ${data.amount} has been received successfully, Mpesa Ref: ${mpesaRef}, Bill Amount: ${billedAmount}, Total paid:${paidAmount}, Amount Due: ${userBalance}`);
+                    sendSms(phone, `Hi ${data.userPaid.first_name}, your payment of Kshs ${data.amount} has been received successfully, Mpesa Ref: ${mpesaRef}, Bill Amount: ${billedAmount}, Total paid:${paidAmount}, Amount Due: ${userBalance}`);
                     //send whatsapp message
                     // const {whatsappText} = require('../utils/whatsapp')
                     // whatsappText(usernumber,`Hello ${userpaid.first_name} your payment of Kshs ${amount} has been received for account number ${recipient}`);

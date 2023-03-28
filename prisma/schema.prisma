@@ -37,7 +37,7 @@ model payment {
 model bill {
   id            Int         @id @default(autoincrement())
   userId        Int
-  amount        BigInt
+  amount        Int
   bill_statusId Int         @default(1)
   account_no    String      @db.VarChar(50)
   created_at    DateTime    @default(now()) @db.Timestamp(0)
