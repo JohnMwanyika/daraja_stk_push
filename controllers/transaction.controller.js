@@ -1,5 +1,7 @@
 require('dotenv').config();
-const { PrismaClient } = require('@prisma/client');
+const {
+    PrismaClient
+} = require('@prisma/client');
 const prisma = new PrismaClient();
 const axios = require('axios');
 // const { response } = require('express');
@@ -29,9 +31,9 @@ module.exports = {
         // creating the password by concatinating the three and converting it to base 8
         const password = Buffer.from(shortcode + passkey + timestamp).toString('base64');
         // posting our data to safaricom using axios
+        console.log("THIS IS THE PASSWORD " + password);
         await axios.post(
-            "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
-            {
+            "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
                 BusinessShortCode: shortcode,
                 Password: password,
                 Timestamp: timestamp,
@@ -43,18 +45,24 @@ module.exports = {
                 CallBackURL: process.env.CALL_BACK_URL,
                 AccountReference: `254${phone}`, // Account number used when paying can also be a name or anything else
                 TransactionDesc: "ICT Test" //description which is optional
-            },
-            {
+            }, {
                 headers: {
                     Authorization: `Bearer ${token}` // token generated everytime you send a request to safaricom,, this is comming from the middleware I created above
                 }
             }
         ).then((response) => {
             console.log(response.data)
-            res.json({ 'response': response.data })
+            res.json({
+                'response': response.data
+            })
         }).catch((err) => {
             console.log(err.message)
-            res.json({ message: { type: 'error', info: err } })
+            res.json({
+                message: {
+                    type: 'error',
+                    info: err
+                }
+            })
             // res.render('payment', { message: { type: 'error', info: err } })
         })
     },
@@ -93,13 +101,13 @@ module.exports = {
         try {
             // store the transaction in our database
             const payment = await prisma.payment.create({
-                data: {
-                    transc_id: transcId,
-                    amount: amount,
-                    number: phone,
-                    transaction_date: date
-                }
-            })
+                    data: {
+                        transc_id: transcId,
+                        amount: amount,
+                        number: phone,
+                        transaction_date: date
+                    }
+                })
                 .then(async (response) => {
                     // get the newly saved transaction's Id
                     let paymentId = response.id;
@@ -111,12 +119,19 @@ module.exports = {
                     let usernumber = response.number.substring(3);
                     // check if client paying is in our database
                     const userPaid = await prisma.user.findUnique({
-                        include: { payment: true },
+                        include: {
+                            payment: true
+                        },
                         where: {
                             phone: `0${usernumber}`
                         }
                     })
-                    return { userPaid, paymentId, recipient, amount }
+                    return {
+                        userPaid,
+                        paymentId,
+                        recipient,
+                        amount
+                    }
                 })
                 .then(async (data) => {
                     console.log('User paid is ' + data.userPaid.first_name);
@@ -132,8 +147,12 @@ module.exports = {
                     });
 
                     const userBill = await prisma.user.findUnique({
-                        include: { bill: true },
-                        where: { id: data.userPaid.id }
+                        include: {
+                            bill: true
+                        },
+                        where: {
+                            id: data.userPaid.id
+                        }
                     })
                     const billedAmount = userBill.bill[0].amount;
                     const paidAmount = updated_transaction.amount;
@@ -203,23 +222,37 @@ module.exports = {
         }
     },
     getTransactions: async (req, res) => {
-        try {
-            const userId = req.session.user.id;
-            console.log(userId);
+        // try {
+        const userId = req.session.user.id;
+        console.log(userId);
 
-            const user = await prisma.user.findUnique({
-                include: { payment: { orderBy: { id: "desc" } } },
+        const user = await prisma.user.findUnique({
+                include: {
+                    payment: {
+                        orderBy: {
+                            id: "desc"
+                        }
+                    }
+                },
                 where: {
                     id: req.session.user.id
                 },
                 // orderBy: { id: "desc" },
             }).then((response) => {
-                console.log(response)
-                res.json({ transactions: response.payment })
+                console.log(response.payment)
+                res.json({
+                    transactions: response.payment
+                })
             })
-        } catch (error) {
-            res.json({ error: error.message })
-        }
+            .catch((err) => {
+                console.log(err.message)
+                res.json({
+                    error: error.message
+                })
+            })
+        // } catch (error) {
+        //     res.json({ error: error.message })
+        // }
     },
     // getBill: async (req, res) => {
     //     const userBill = await prisma.user.findUnique({

@@ -29,7 +29,8 @@
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.42",
     "pug": "^3.0.2",
-    "sweetalert2": "^11.7.3"
+    "sweetalert2": "^11.7.3",
+    "unirest": "^0.6.0"
   },
   "devDependencies": {
     "prisma": "^4.10.1"

@@ -69,7 +69,7 @@ app.get('/payment', authenticateUser, (req, res) => {
 const transactionRoutes = require('./routes/transaction.route');
 app.use('/transaction', transactionRoutes);
 
-// middleware function to generate token 
+// // middleware function to generate token 
 // const generateToken = async (req, res, next) => {
 
 //     let secret = process.env.MPESA_CONSUMER_SECRET;
@@ -93,7 +93,7 @@ app.use('/transaction', transactionRoutes);
 
 // }
 
-// middleware to geenerate access token on every request
+// // middleware to geenerate access token on every request
 // app.use(generateToken);
 
 // Sending the stk push tothe provided credentials on the rquest body
@@ -211,41 +211,41 @@ app.use('/transaction', transactionRoutes);
 // // Getting feedback
 // app.get('/callback')
 
-app.get('/registerurl', (req, res) => {
-    // console.log('My token is',token);
-    axios.post(
-        'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl',
-        {
-            // "ShortCode": "600610",
-            ShortCode: process.env.MPESA_SHORT_CODE,
-            ResponseType: "Completed",
-            ConfirmationURL: "https://lipa.onrender.com/confirmation",
-            ValidationURL: "https://lipa.onrender.com/validation"
-        },
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-            }
-        }
-    )
-        .then((response) => {
-            console.log(response.data);
-            const data = response.data;
-            res.json({ 'response': data });
-        })
-        .catch((err) => {
-            if (err) {
-                console.log(err.message)
-            }
-        })
-})
+// app.get('/registerurl', (req, res) => {
+//     // console.log('My token is',token);
+//     axios.post(
+//         'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl',
+//         {
+//             // "ShortCode": "600610",
+//             ShortCode: process.env.MPESA_SHORT_CODE,
+//             ResponseType: "Completed",
+//             ConfirmationURL: "https://lipa.onrender.com/confirmation",
+//             ValidationURL: "https://lipa.onrender.com/validation"
+//         },
+//         {
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 Authorization: `Bearer ${token}`
+//             }
+//         }
+//     )
+//         .then((response) => {
+//             console.log(response.data);
+//             const data = response.data;
+//             res.json({ 'response': data });
+//         })
+//         .catch((err) => {
+//             if (err) {
+//                 console.log(err.message)
+//             }
+//         })
+// })
 
-app.post('/confirmation', (req, res) => {
-    const results = req.body;
-    console.log(results);
-})
-app.post('/validation', (req, res) => {
-    var results = req.body;
-    console.log(results);
-})
+// app.post('/confirmation', (req, res) => {
+//     const results = req.body;
+//     console.log(results);
+// })
+// app.post('/validation', (req, res) => {
+//     var results = req.body;
+//     console.log(results);
+// })
