@@ -4,7 +4,10 @@ const bcrypt = require("bcrypt");
 module.exports = {
   loginForm: (req, res) => {
     console.log('New visitor');
-    res.render("signin", { title: 'Sign in to Lipa' });
+    // display errors when user is not authenticated
+    let errors =
+      req.query.error == 'no_session' ? 'Your session has just expired, sign in to proceed' : ''
+    res.render("signin", { title: 'Sign in to Lipa', errors });
   },
   signUp: async (req, res) => {
     try {

@@ -8,7 +8,7 @@ module.exports = {
                 // res.render('signin',{
                 //     message:{info:'Looks like your session just ended..login to proceed',type:'error'}
                 // })
-                res.redirect('/')
+                res.redirect('/?error=no_session')
             }
             next();
         } catch (error) {
