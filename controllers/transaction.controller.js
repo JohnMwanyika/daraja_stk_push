@@ -285,7 +285,7 @@ module.exports = {
         const shortCode = process.env.MPESA_SHORT_CODE;
 
         try {
-            const response = await simulateTransaction(token, shortCode, 100, 'TestingMyApi');
+            const response = await simulateTransaction(token, shortCode, '100', 'TestingMyApi');
             console.log(response);
             res.json({ status: 'success', data: response });
         } catch (error) {

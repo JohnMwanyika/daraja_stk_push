@@ -96,7 +96,7 @@ async function registerUrl(access_token, shortCode, confirmation_url, validation
 
 async function simulateTransaction(access_token, shortCode, amount, billReff) {
     const url = 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/simulate';
-    const headers = { Authorization: `Bearer ${access_token}`, 'Content-Type': 'application/json' };
+    const headers = { Authorization: `Bearer ${access_token}` };
     let data = {
         ShortCode: shortCode,
         CommandID: "CustomerPayBillOnline",
