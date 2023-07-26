@@ -7,7 +7,7 @@ const axios = require('axios');
 // const { response } = require('express');
 const sendSms = require('../utils/sendSms');
 const moment = require('moment');
-const { registerUrl } = require('../utils/myMpesa');
+const { registerUrl, simulateTransaction } = require('../utils/myMpesa');
 
 module.exports = {
     stkPush: async (req, res) => {
@@ -266,17 +266,32 @@ module.exports = {
             res.json({ status: 'success', data: response });
         } catch (error) {
             console.log(error);
-            res.json({ status: 'error', data: response });
+            res.json({ status: 'error', data: error });
         }
     },
     confirmTransaction: (req, res) => {
+        console.log('-------------------------------- CONFIRMATION -------------------------------------')
         const response = req.body
         console.log(response)
-        res.json({ status: 'success', data: response })
+        // res.json({ status: 'success', data: response })
     },
     validateTransaction: (req, res) => {
+        console.log('-------------------------------- VALIDATION -------------------------------------')
         const response = req.body
         console.log(response)
-        res.json({ status: 'success', data: response })
+        // res.json({ status: 'success', data: response })
+    },
+    simulate: async (req, res) => {
+        const shortCode = process.env.MPESA_SHORT_CODE;
+
+        try {
+            const response = await simulateTransaction(token, shortCode, 100, 'TestingMyApi');
+            console.log(response);
+            res.json({ status: 'success', data: response });
+        } catch (error) {
+            console.log(error);
+            res.json({ status: 'error', data: error });
+
+        }
     }
 };

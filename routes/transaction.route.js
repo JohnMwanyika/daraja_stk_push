@@ -17,7 +17,8 @@ const {
     processCallback,
     registerUrls,
     confirmTransaction,
-    validateTransaction
+    validateTransaction,
+    simulate
 } = require('../controllers/transaction.controller');
 
 
@@ -34,6 +35,9 @@ router.get('/register', getAccessToken, registerUrls);
 router.post('/confirmation', confirmTransaction);
 // validation request handler
 router.post('/validation', validateTransaction);
+
+// simulate the c2b transaction
+router.get('/simulate', getAccessToken, simulate);
 
 
 module.exports = router;

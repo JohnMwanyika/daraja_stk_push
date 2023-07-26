@@ -90,12 +90,39 @@ async function registerUrl(access_token, shortCode, confirmation_url, validation
             // Handle the error without response data (e.g., network error)
             return { status: 'error', data: `A network error occured while initiating payment request:- ${error.message}` };
         }
-    }
+    };
 
-}
+};
+
+async function simulateTransaction(access_token, shortCode, amount, billReff) {
+    const url = 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/simulate';
+    const headers = { Authorization: `Bearer ${access_token}`, 'Content-Type': 'application/json' };
+    let data = {
+        ShortCode: shortCode,
+        CommandID: "CustomerPayBillOnline",
+        Amount: amount,
+        Msisdn: "254708374149",
+        BillRefNumber: billReff
+    };
+
+    try {
+        const response = await axios.post(url, data, { headers });
+        console.log(response);
+        return response.data
+    } catch (error) {
+        if (error.response && error.response.data) {
+            const responseData = error.response.data;
+            // Now you can access and handle the data in the error response
+            return { status: 'error', data: `Error: ${responseData.errorMessage}` };
+        } else {
+            // Handle the error without response data (e.g., network error)
+            return { status: 'error', data: `A network error occured while initiating payment request:- ${error.message}` };
+        }
+    };
+};
 
 
-module.exports = { stkPush, registerUrl }
+module.exports = { stkPush, registerUrl, simulateTransaction };
 
 
 const makeStkPush = async () => {
