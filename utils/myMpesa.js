@@ -96,7 +96,7 @@ async function registerUrl(access_token, shortCode, confirmation_url, validation
 
 async function simulateTransaction(access_token, shortCode, amount, billReff) {
     const url = 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/simulate';
-    const headers = { Authorization: `Bearer ${access_token}` };
+    const headers = { Authorization: `Bearer ${access_token}`, 'Content-Type': 'application/json' };
     let data = {
         ShortCode: shortCode,
         CommandID: "CustomerPayBillOnline",
@@ -105,6 +105,7 @@ async function simulateTransaction(access_token, shortCode, amount, billReff) {
         BillRefNumber: billReff
     };
 
+    JSON.stringify(data);
     try {
         const response = await axios.post(url, data, { headers });
         console.log(response);
