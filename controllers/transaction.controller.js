@@ -7,6 +7,7 @@ const axios = require('axios');
 // const { response } = require('express');
 const sendSms = require('../utils/sendSms');
 const moment = require('moment');
+const { registerUrl } = require('../utils/myMpesa');
 
 module.exports = {
     stkPush: async (req, res) => {
@@ -34,22 +35,22 @@ module.exports = {
         console.log("THIS IS THE PASSWORD " + password);
         await axios.post(
             "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
-                BusinessShortCode: shortcode,
-                Password: password,
-                Timestamp: timestamp,
-                TransactionType: "CustomerPayBillOnline", // you can also use "CustomerBuyGoodsOnline"
-                Amount: amount,
-                PartyA: `254${phone}`, // initiator phone number
-                PartyB: shortcode, //paybill number
-                PhoneNumber: `254${phone}`, // initiator phone number
-                CallBackURL: process.env.CALL_BACK_URL,
-                AccountReference: `254${phone}`, // Account number used when paying can also be a name or anything else
-                TransactionDesc: "ICT Test" //description which is optional
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}` // token generated everytime you send a request to safaricom,, this is comming from the middleware I created above
-                }
+            BusinessShortCode: shortcode,
+            Password: password,
+            Timestamp: timestamp,
+            TransactionType: "CustomerPayBillOnline", // you can also use "CustomerBuyGoodsOnline"
+            Amount: amount,
+            PartyA: `254${phone}`, // initiator phone number
+            PartyB: shortcode, //paybill number
+            PhoneNumber: `254${phone}`, // initiator phone number
+            CallBackURL: process.env.CALL_BACK_URL,
+            AccountReference: `254${phone}`, // Account number used when paying can also be a name or anything else
+            TransactionDesc: "ICT Test" //description which is optional
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}` // token generated everytime you send a request to safaricom,, this is comming from the get access token
             }
+        }
         ).then((response) => {
             console.log(response.data)
             res.json({
@@ -101,13 +102,13 @@ module.exports = {
         try {
             // store the transaction in our database
             const payment = await prisma.payment.create({
-                    data: {
-                        transc_id: transcId,
-                        amount: amount,
-                        number: phone,
-                        transaction_date: date
-                    }
-                })
+                data: {
+                    transc_id: transcId,
+                    amount: amount,
+                    number: phone,
+                    transaction_date: date
+                }
+            })
                 .then(async (response) => {
                     // get the newly saved transaction's Id
                     let paymentId = response.id;
@@ -227,23 +228,23 @@ module.exports = {
         console.log(userId);
 
         const user = await prisma.user.findUnique({
-                include: {
-                    payment: {
-                        orderBy: {
-                            id: "desc"
-                        }
+            include: {
+                payment: {
+                    orderBy: {
+                        id: "desc"
                     }
-                },
-                where: {
-                    id: req.session.user.id
-                },
-                // orderBy: { id: "desc" },
-            }).then((response) => {
-                console.log(response.payment)
-                res.json({
-                    transactions: response.payment
-                })
+                }
+            },
+            where: {
+                id: req.session.user.id
+            },
+            // orderBy: { id: "desc" },
+        }).then((response) => {
+            console.log(response.payment)
+            res.json({
+                transactions: response.payment
             })
+        })
             .catch((err) => {
                 console.log(err.message)
                 res.json({
@@ -254,15 +255,28 @@ module.exports = {
         //     res.json({ error: error.message })
         // }
     },
-    // getBill: async (req, res) => {
-    //     const userBill = await prisma.user.findUnique({
-    //         include: { bill: true },
-    //         where: {
-    //             id: req.session.user.id
-    //         }
-    //     })
-    //         .then((data) => {
-    //             console.log(data)
-    //         })
-    // }
+    registerUrls: async (req, res) => {
+        const shortCode = process.env.MPESA_SHORT_CODE;
+        const confirmUrl = process.env.MPESA_CONFIRM_URL;
+        const validateUrl = process.env.MPESA_VALIDATE_URL;
+
+        try {
+            const response = await registerUrl(token, shortCode, confirmUrl, validateUrl);
+            console.log(response.data);
+            res.json({ status: 'success', data: response });
+        } catch (error) {
+            console.log(error);
+            res.json({ status: 'error', data: response });
+        }
+    },
+    confirmTransaction: (req, res) => {
+        const response = req.body
+        console.log(response)
+        res.json({ status: 'success', data: response })
+    },
+    validateTransaction: (req, res) => {
+        const response = req.body
+        console.log(response)
+        res.json({ status: 'success', data: response })
+    }
 };

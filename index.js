@@ -219,8 +219,8 @@ app.use('/transaction', transactionRoutes);
 //             // "ShortCode": "600610",
 //             ShortCode: process.env.MPESA_SHORT_CODE,
 //             ResponseType: "Completed",
-//             ConfirmationURL: "https://lipa.onrender.com/confirmation",
-//             ValidationURL: "https://lipa.onrender.com/validation"
+//             ConfirmationURL: "https://lipa.onrender.com/payment/confirmation",
+//             ValidationURL: "https://lipa.onrender.com/payment/validation"
 //         },
 //         {
 //             headers: {

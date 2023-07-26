@@ -14,7 +14,10 @@ const {
 const {
     getTransactions,
     stkPush,
-    processCallback
+    processCallback,
+    registerUrls,
+    confirmTransaction,
+    validateTransaction
 } = require('../controllers/transaction.controller');
 
 
@@ -25,6 +28,12 @@ router.get('/user_transactions', authenticateUser, getTransactions);
 router.post('/stk', getAccessToken, authenticateUser, stkPush);
 // callback data
 router.post('/callback', processCallback);
+// register Urls
+router.get('/register', getAccessToken, registerUrls);
+// consfirmation request handler
+router.post('/confirmation', confirmTransaction);
+// validation request handler
+router.post('/validation', validateTransaction);
 
 
 module.exports = router;
