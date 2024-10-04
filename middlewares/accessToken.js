@@ -1,5 +1,4 @@
 require('dotenv').config();
-const unirest = require('unirest');
 const axios = require('axios');
 
 module.exports = {
@@ -8,7 +7,7 @@ module.exports = {
         let consumer = process.env.MPESA_CONSUMER_KEY;
         let production = process.env.MPESA_PRODUCTION;
 
-    const url = production ? "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" : "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+        const url = production ? "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" : "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
 
         let auth = Buffer.from(`${consumer}:${secret}`).toString('base64');
         console.log('AUTHENTICATION ' + auth);

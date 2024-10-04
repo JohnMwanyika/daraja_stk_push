@@ -37,7 +37,7 @@ module.exports = {
         const url = production ? "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest" : "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
 
         await axios.post(
-            "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
+            url, {
             BusinessShortCode: shortcode,
             Password: password,
             Timestamp: timestamp,
