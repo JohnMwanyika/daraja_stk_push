@@ -10,8 +10,9 @@ const cb = process.env.CALL_BACK_URL;
 
 
 async function getAccessToken(secret, key) {
-    const url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
-
+    const url = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+    // sandbox
+    // const url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
     let auth = Buffer.from(`${key}:${secret}`).toString('base64');
 
     const headers = {
@@ -19,7 +20,8 @@ async function getAccessToken(secret, key) {
     }
     try {
         const response = await axios.get(url, { headers });
-        return response.data.access_token;
+        return response.data;
+        // access_token;
     } catch (error) {
         return { status: 'error', data: `An error occured while getting access token: ${error.message}` }
     }
@@ -33,12 +35,14 @@ async function stkPush(shortcode, passkey, access_token, callBackUrl, phone, amo
     const timestamp = moment().format('YYYYMMDDHHmmss');
     const password = Buffer.from(shortcode + passkey + timestamp).toString('base64');
 
-    const url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+    const url = "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+    // sandbox
+    // const url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
     const data = {
         BusinessShortCode: shortcode,
         Password: password,
         Timestamp: timestamp,
-        TransactionType: "CustomerPayBillOnline", // you can also use "CustomerBuyGoodsOnline" or "CustomerPayBillOnline"
+        TransactionType: "CustomerBuyGoodsOnline", // you can also use "CustomerBuyGoodsOnline" or "CustomerPayBillOnline"
         Amount: amount,
         PartyA: phone, // initiator phone number
         PartyB: shortcode, //paybill number
@@ -47,12 +51,15 @@ async function stkPush(shortcode, passkey, access_token, callBackUrl, phone, amo
         AccountReference: accountNo, // Account number used when paying can also be a name or anything else
         TransactionDesc: description || "" //description which is optional
     };
-    const headers = { Authorization: `Bearer ${access_token}` };
+    const headers = {
+        Authorization: `Bearer ${access_token}`
+    };
     try {
         const response = await axios.post(url, data, { headers });
         console.log(response);
         return response.data
     } catch (error) {
+        console.log(error.message);
         if (error.response && error.response.data) {
             const responseData = error.response.data;
             // Now you can access and handle the data in the error response
@@ -128,13 +135,15 @@ module.exports = { stkPush, registerUrl, simulateTransaction };
 
 const makeStkPush = async () => {
     try {
-        const access_token = await getAccessToken(process.env.MPESA_CONSUMER_SECRET, process.env.MPESA_CONSUMER_KEY);
-        const response = await stkPush(sc, pk, access_token, cb, 254726330706, 1, 'Test', 'Testing my app money will be refunded')
-        console.log('This is Access_Token ###', access_token)
+        const data = await getAccessToken(process.env.MPESA_CONSUMER_SECRET, process.env.MPESA_CONSUMER_KEY);
+        const response = await stkPush(sc, pk, data.access_token, cb, 254707438654, 1, 'Test', 'Testing')
+        console.log('This is Access_Token ###', data)
         console.log('This is response ***', response)
+        return response;
     } catch (error) {
+        throw error
         console.log(error.message);
     }
 };
 
-// makeStkPush();
+makeStkPush().then(res => console.log(res)).catch(e => console.ward(e));

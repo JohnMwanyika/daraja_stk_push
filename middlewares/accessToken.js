@@ -6,12 +6,15 @@ module.exports = {
     getAccessToken: async (req, res, next) => {
         let secret = process.env.MPESA_CONSUMER_SECRET;
         let consumer = process.env.MPESA_CONSUMER_KEY;
+        let production = process.env.MPESA_PRODUCTION;
+
+    const url = production ? "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials" : "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
 
         let auth = Buffer.from(`${consumer}:${secret}`).toString('base64');
         console.log('AUTHENTICATION ' + auth);
 
         try {
-            const response = await axios.get("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
+            const response = await axios.get(url, {
                 headers: {
                     Authorization: `Basic ${auth}`
                 }

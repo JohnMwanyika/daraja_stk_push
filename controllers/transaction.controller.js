@@ -8,6 +8,7 @@ const axios = require('axios');
 const sendSms = require('../utils/sendSms');
 const moment = require('moment');
 const { registerUrl, simulateTransaction } = require('../utils/myMpesa');
+let production = process.env.MPESA_PRODUCTION;
 
 module.exports = {
     stkPush: async (req, res) => {
@@ -33,6 +34,8 @@ module.exports = {
         const password = Buffer.from(shortcode + passkey + timestamp).toString('base64');
         // posting our data to safaricom using axios
         console.log("THIS IS THE PASSWORD " + password);
+        const url = production ? "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest" : "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest";
+
         await axios.post(
             "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
             BusinessShortCode: shortcode,
